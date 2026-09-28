@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ทะเบียนคำขอใช้ตำแหน่งว่าง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --surface-alt:#eef3f3; --border:#dbe4e5;
+  --text:#17242a; --text-muted:#5c6d73;
+  --accent:#0e6f68; --accent-strong:#0a5750; --accent-soft:#e1f0ee; --on-accent:#ffffff;
+  --good-bg:#e6f4ea; --good-text:#1a7f37;
+  --bad-bg:#fdeceb; --bad-text:#b42318;
+  --neutral-bg:#eef1f2; --neutral-text:#5c6d73;
+  --shadow:0 1px 2px rgba(23,36,42,.06),0 1px 1px rgba(23,36,42,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111a1c; --surface:#172225; --surface-alt:#1c2a2c; --border:#2a3a3c;
+    --text:#e7eef0; --text-muted:#93a7ab;
+    --accent:#3fcfc0; --accent-strong:#6fe0d3; --accent-soft:#163330; --on-accent:#0b1715;
+    --good-bg:#12321f; --good-text:#4ade80; --bad-bg:#3a1815; --bad-text:#f87171;
+    --neutral-bg:#22302f; --neutral-text:#93a7ab; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111a1c; --surface:#172225; --surface-alt:#1c2a2c; --border:#2a3a3c;
+  --text:#e7eef0; --text-muted:#93a7ab;
+  --accent:#3fcfc0; --accent-strong:#6fe0d3; --accent-soft:#163330; --on-accent:#0b1715;
+  --good-bg:#12321f; --good-text:#4ade80; --bad-bg:#3a1815; --bad-text:#f87171;
+  --neutral-bg:#22302f; --neutral-text:#93a7ab; --shadow:none;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Noto Sans Thai","Sarabun",Tahoma,sans-serif;font-size:14px;line-height:1.55}
+h1,h2{font-family:"Sarabun","Noto Sans Thai",Tahoma,sans-serif;text-wrap:balance;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px}
+.row{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap}
+.brand{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:1px}
+.brand h1{font-size:20px;font-weight:700}
+.brand .sub{font-size:12.5px;color:var(--text-muted)}
+.search{position:relative;flex:1 1 260px;max-width:520px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text-muted);pointer-events:none}
+.search input{width:100%;padding:9px 12px 9px 34px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);font:inherit;font-size:13.5px}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search input:disabled{opacity:.7;cursor:not-allowed}
+.pill{font-size:12.5px;color:var(--accent-strong);background:var(--accent-soft);border-radius:999px;padding:6px 12px;font-weight:600;white-space:nowrap}
+
+nav.tabs{background:var(--bg);border-bottom:1px solid var(--border);padding:0 16px}
+.tabs-in{max-width:1400px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:thin}
+.tab{flex:0 0 auto;font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;border:0;background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap}
+.tab:hover{background:var(--surface-alt);color:var(--text)}
+.tab.on{background:var(--accent);color:var(--on-accent)}
+.tab .n{opacity:.75;font-weight:500;margin-left:5px;font-variant-numeric:tabular-nums}
+.tab:focus-visible,.card:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{max-width:1400px;margin:0 auto;padding-block:18px 40px;padding-inline:16px;width:100%}
+.total{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:18px 22px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.total b{font-family:"Sarabun",sans-serif;font-size:34px;font-weight:700;color:var(--accent-strong);line-height:1.1}
+.total span{font-weight:600;color:var(--accent-strong)}
+.total small{color:var(--text-muted);font-size:12.5px;flex-basis:100%}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.card{text-align:left;cursor:pointer;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;transition:border-color .12s,transform .12s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card b{font-family:"Sarabun",sans-serif;font-size:28px;font-weight:700;color:var(--accent-strong);line-height:1.15;font-variant-numeric:tabular-nums}
+.card .l{font-size:13px;color:var(--text)}
+.card .d{font-size:12px;color:var(--text-muted);line-height:1.4}
+.card .split{display:flex;gap:10px;font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.card .split .g{color:var(--good-text)} .card .split .r{color:var(--bad-text)}
+
+.sec-h{font-size:17px;font-weight:700;margin:28px 0 10px}
+.sec-sub{margin:-6px 0 10px;font-size:12.5px;color:var(--text-muted)}
+.pcard .l{font-size:15px;font-weight:600;display:flex;align-items:baseline;gap:8px}
+.pcard .l b{font-size:26px}
+.pbar{height:6px;border-radius:3px;background:var(--surface-alt);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--accent)}
+.card .split{flex-wrap:wrap}
+.matrix{max-height:none;min-height:0}
+.matrix th{white-space:normal;min-width:84px;vertical-align:bottom}
+.matrix tbody th{background:var(--surface);color:var(--text);position:sticky;left:0;z-index:1;white-space:nowrap}
+.matrix thead th:first-child{position:sticky;left:0;z-index:2}
+.matrix td{white-space:nowrap}
+.matrix .tot{font-weight:700;color:var(--accent-strong)}
+.matrix tr.sum th,.matrix tr.sum td{background:var(--surface-alt);font-weight:600}
+.matrix tr.hl th,.matrix tr.hl td{background:var(--accent-soft)}
+.mcell{font:inherit;font-variant-numeric:tabular-nums;background:none;border:0;color:var(--accent-strong);cursor:pointer;padding:2px 6px;border-radius:5px;text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:3px}
+.mcell:hover{background:var(--accent-soft)}
+.zero{color:var(--border)}
+.sheet-head{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.sheet-head h2{font-size:18px;font-weight:700}
+.sheet-head .meta{font-size:12.5px;color:var(--text-muted)}
+.shell{overflow:auto;max-height:calc(100vh - 230px);min-height:240px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+th{position:sticky;top:0;z-index:1;background:var(--surface-alt);color:var(--text-muted);font-weight:600;font-size:12px;white-space:nowrap}
+td{white-space:pre-line}
+td.c-no{color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c-n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c-posno{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c-wide{min-width:200px}
+td.c-reason{min-width:280px;max-width:420px;color:var(--text-muted);font-size:12.5px}
+td.c-letter{min-width:170px;font-size:12.5px}
+tbody tr:hover td{background:var(--surface-alt)}
+mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.good{background:var(--good-bg);color:var(--good-text)}
+.badge.bad{background:var(--bad-bg);color:var(--bad-text)}
+.badge.neutral{background:var(--neutral-bg);color:var(--neutral-text)}
+.prov{display:inline-block;font-size:11.5px;padding:0 7px;border-radius:5px;background:var(--surface-alt);color:var(--text-muted);margin-bottom:2px}
+.empty{padding:40px 16px;text-align:center;color:var(--text-muted)}
+
+.pos-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.pos-box label{font-weight:600}
+.pos-box .hint{font-size:12.5px;color:var(--text-muted)}
+.pos-box input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);max-width:360px;width:100%;font-variant-numeric:tabular-nums}
+.pos-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.group{margin-bottom:18px}
+.group h3{font-size:14px;margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
+.group h3 .n{font-size:12px;color:var(--text-muted);font-weight:500}
+.group .shell{max-height:none;min-height:0}
+footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font-size:12px;color:var(--text-muted)}
+@media (max-width:640px){
+  .brand h1{font-size:18px}
+  .search{max-width:none}
+  .total b{font-size:28px}
+  .shell{max-height:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="row">
+    <div class="brand">
+      <h1>ทะเบียนคำขอใช้ตำแหน่งว่าง</h1>
+      <span class="sub">คณะกรรมการบริหารทรัพยากรบุคคล เขตสุขภาพที่ 1 · ปี 2569 · <span id="nCats">10</span> หมวดข้อมูล</span>
+      <span class="sub">ข้อมูล ณ 26 กันยายน 2569</span>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input id="search" type="search" placeholder="เลือกหมวดด้านบนเพื่อค้นหา..." aria-label="ค้นหาในหมวด" disabled>
+    </div>
+    <span class="pill num" id="pill">กำลังโหลด…</span>
+  </div>
+</header>
+<nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-in" id="tabs" role="tablist"></div></nav>
+<main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
+<footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง</footer>
+
+<script>
+(function(){
+  // หมวด = ชีตในไฟล์ Excel (ตามลำดับเดิม)
+  const SHEETS=[
+    {cat:'ปรับปรุงตำแหน่ง ขรก.', name:'ปรับปรุง (ขรก)'},
+    {cat:'ยุบกำหนดตำแหน่งสูงขึ้น ขรก.', name:'ปรับปรุง (ขรก) (ยุบ)'},
+    {cat:'เกลี่ยอัตรา ขรก. (มีคนครอง)', name:'เกลี่ยอัตราตัดโอน (ขรก)'},
+    {cat:'เกลี่ยอัตรา ขรก. (ตำแหน่งว่าง)', name:'เกลี่ยอัตราตัดโอน (ขรก) ต.ว่าง'},
+    {cat:'ขอใช้ตำแหน่ง ขรก.', name:'ขอใช้ ขรก.'},
+    {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พรก'},
+    {cat:'จ้าง/เปลี่ยนตำแหน่ง พกส.', name:'จ้าง (พกส)'},
+    {cat:'พกส. เข้าสู่สายงานผู้ช่วย', name:'จ้าง (พกส) (ผู้ช่วย)'},
+    {cat:'เปลี่ยนประเภทการจ้าง', name:'เปลี่ยนประเภทการจ้าง'},
+    {cat:'จ้าง/เปลี่ยนตำแหน่ง ลจช.', name:'จ้าง (ลจช)'}
+  ];
+  // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล)
+  const COLS=[
+    {k:'org',h:'สังกัด'},
+    {k:'unitFull',h:'ส่วนราชการ',cls:'c-wide'},
+    {k:'posno',h:'ตำแหน่งเลขที่',cls:'c-posno'},
+    {k:'pos',h:'ชื่อสายงาน / ตำแหน่ง'},
+    {k:'level',h:'ระดับ'},
+    {k:'exec',h:'ตำแหน่งทางการบริหาร'},
+    {k:'typeold',h:'ประเภทการจ้างเดิม'},
+    {k:'newpos',h:'ตำแหน่งใหม่ / ที่ขอ',cls:'c-wide'},
+    {k:'typenew',h:'ประเภทการจ้างใหม่'},
+    {k:'cond',h:'เงื่อนไขในการดำรงตำแหน่ง'},
+    {k:'frame',h:'กรอบ',cls:'c-n'},
+    {k:'actual',h:'ปฏิบัติงานจริง',cls:'c-n'},
+    {k:'short',h:'ขาด',cls:'c-n'},
+    {k:'reason',h:'เหตุผลประกอบ',cls:'c-reason'},
+    {k:'result',h:'ผลการพิจารณาเขต',badge:true},
+    {k:'meetTxt',h:'ครั้งที่ประชุม'},
+    {k:'letter',h:'หนังสือแจ้งผล',cls:'c-letter'}
+  ];
+  const PROVS=['เชียงใหม่','เชียงราย','ลำพูน','ลำปาง','แม่ฮ่องสอน','น่าน','พะเยา','แพร่'];
+  const $=id=>document.getElementById(id);
+  const fmt=n=>n.toLocaleString('th-TH');
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const badgeCls=t=>/ยกเลิก|ไม่เห็นชอบ|ไม่อนุมัติ/.test(t)?'bad':/เห็นชอบ|อนุมัติ/.test(t)?'good':'neutral';
+  const isOk=r=>badgeCls(r.result)==='good', isBad=r=>badgeCls(r.result)==='bad';
+
+  let active='overview', total=0;
+  const built={};
+  const tabBtns={};
+  const search=$('search'), pill=$('pill'), main=$('main');
+
+  function hl(text,q){
+    const s=esc(text); if(!q)return s;
+    const i=s.toLowerCase().indexOf(esc(q).toLowerCase()); if(i<0)return s;
+    return s.slice(0,i)+'<mark>'+s.slice(i,i+esc(q).length)+'</mark>'+s.slice(i+esc(q).length);
+  }
+  function cell(r,c,q){
+    let v=r[c.k]; if(v==null||v==='')return '<td class="'+(c.cls||'')+'">'+(c.cls==='c-n'?'–':'')+'</td>';
+    if(c.badge)return '<td><span class="badge '+badgeCls(v)+'">'+esc(v)+'</span></td>';
+    if(c.k==='org')return '<td><span class="prov">'+esc(r.prov)+'</span>\n'+hl(v,q)+'</td>';
+    return '<td class="'+(c.cls||'')+'">'+hl(v,q)+'</td>';
+  }
+  function rowsHtml(rows,cols,q,showCat){
+    return rows.map(r=>'<tr><td class="c-no">'+r.no+'</td>'+(showCat?'<td>'+esc(r.sheetName)+'</td>':'')+cols.map(c=>cell(r,c,q)).join('')+'</tr>').join('');
+  }
+  function colsFor(rows){ return COLS.filter(c=>rows.some(r=>r[c.k]!=null&&r[c.k]!=='')); }
+
+  function makeTab(key,label,n){
+    const b=document.createElement('button');
+    b.type='button'; b.className='tab'; b.setAttribute('role','tab');
+    b.innerHTML=label+(n!=null?'<span class="n">'+fmt(n)+'</span>':'');
+    b.onclick=()=>select(key);
+    $('tabs').appendChild(b); tabBtns[key]=b;
+  }
+
+  function buildOverview(){
+    const sec=document.createElement('section');
+    const okAll=SHEETS.reduce((a,s)=>a+s.rows.filter(isOk).length,0);
+    sec.innerHTML='<div class="total"><b class="num">'+fmt(total)+'</b><span>รายการทั้งหมด ใน '+SHEETS.length+' หมวด</span>'+
+      '<small>เห็นชอบ / อนุมัติ '+fmt(okAll)+' รายการ · การประชุมครั้งที่ 1/2569 – 7/2569 · คลิกการ์ดเพื่อดูรายการในหมวดนั้น</small></div>'+
+      '<div class="cards">'+SHEETS.map((s,i)=>{
+        const ok=s.rows.filter(isOk).length, bad=s.rows.filter(isBad).length;
+        return '<button type="button" class="card" data-i="'+i+'"><b>'+fmt(s.rows.length)+'</b><span class="l">'+esc(s.name)+'</span><span class="d">'+esc(s.cat)+'</span>'+
+          '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(ok)+'</span>'+(bad?'<span class="r">ยกเลิก '+fmt(bad)+'</span>':'')+'</span></button>';
+      }).join('')+'</div>';
+    // ภาพรวมรายจังหวัด
+    const all=SHEETS.flatMap(s=>s.rows);
+    const provs=PROVS.map(p=>{ const rs=all.filter(r=>r.prov===p); return {p,n:rs.length,ok:rs.filter(isOk).length,bad:rs.filter(isBad).length,units:new Set(rs.map(r=>r.unit)).size}; }).sort((a,b)=>b.n-a.n);
+    const max=Math.max(1,...provs.map(x=>x.n));
+    const cnt=(p,s)=>s.rows.filter(r=>r.prov===p).length;
+    sec.insertAdjacentHTML('beforeend',
+      '<h2 class="sec-h">แยกตามจังหวัด</h2>'+
+      '<div class="cards">'+provs.map(x=>'<button type="button" class="card pcard" data-p="'+esc(x.p)+'"><span class="l"><b>'+fmt(x.n)+'</b> '+esc(x.p)+'</span>'+
+        '<span class="pbar"><i style="width:'+(x.n/max*100)+'%"></i></span>'+
+        '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(x.ok)+'</span>'+(x.bad?'<span class="r">ยกเลิก '+fmt(x.bad)+'</span>':'')+'<span>'+fmt(x.units)+' หน่วยงาน</span></span></button>').join('')+'</div>'+
+      '<h2 class="sec-h">จังหวัด × หมวด</h2><p class="sec-sub">ตัวเลขคือจำนวนรายการ คลิกตัวเลขเพื่อเปิดหมวดนั้นพร้อมกรองจังหวัด</p>'+
+      '<div class="shell matrix"><table><thead><tr><th>จังหวัด</th>'+SHEETS.map((s,i)=>'<th title="'+esc(s.cat)+'">'+esc(s.name)+'</th>').join('')+'<th>รวม</th></tr></thead><tbody>'+
+        provs.map(x=>'<tr><th scope="row">'+esc(x.p)+'</th>'+SHEETS.map((s,i)=>{ const n=cnt(x.p,s); return '<td class="c-n">'+(n?'<button type="button" class="mcell" data-p="'+esc(x.p)+'" data-i="'+i+'">'+fmt(n)+'</button>':'<span class="zero">–</span>')+'</td>'; }).join('')+'<td class="c-n tot">'+fmt(x.n)+'</td></tr>').join('')+
+        '<tr class="sum"><th scope="row">รวม</th>'+SHEETS.map(s=>'<td class="c-n">'+fmt(s.rows.length)+'</td>').join('')+'<td class="c-n tot">'+fmt(total)+'</td></tr>'+
+      '</tbody></table></div>');
+    sec.querySelectorAll('.card[data-i]').forEach(c=>c.onclick=()=>select(+c.dataset.i));
+    sec.querySelectorAll('.mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.p));
+    sec.querySelectorAll('.pcard').forEach(c=>c.onclick=()=>{ const t=sec.querySelector('.matrix'); t.scrollIntoView({behavior:'smooth',block:'start'}); t.querySelectorAll('tbody tr').forEach(tr=>tr.classList.toggle('hl',tr.firstChild.textContent===c.dataset.p)); });
+    return {el:sec};
+  }
+
+  function buildSheet(i){
+    const s=SHEETS[i], cols=colsFor(s.rows);
+    const sec=document.createElement('section');
+    sec.innerHTML='<div class="sheet-head"><h2>'+esc(s.name)+'</h2><div class="meta">'+esc(s.cat)+' · '+fmt(s.rows.length)+' รายการ</div></div>'+
+      '<div class="shell"><table><thead><tr><th>ลำดับ</th>'+cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody></tbody></table>'+
+      '<div class="empty" hidden>ไม่พบรายการที่ตรงกับคำค้นหา ลองใช้คำที่สั้นลง</div></div>';
+    const tb=sec.querySelector('tbody'), em=sec.querySelector('.empty');
+    const obj={el:sec,filter(q){
+      // พิมพ์ชื่อจังหวัดตรงตัว = กรองตามจังหวัด
+      const rows=!q?s.rows:PROVS.includes(q)?s.rows.filter(r=>r.prov===q):s.rows.filter(r=>r._s.indexOf(q)>=0);
+      tb.innerHTML=rowsHtml(rows,cols,q);
+      em.hidden=rows.length>0;
+      pill.textContent=q?fmt(rows.length)+' / '+fmt(s.rows.length)+' รายการ':fmt(s.rows.length)+' รายการ';
+    }};
+    obj.filter('');
+    return obj;
+  }
+
+  function buildPos(){
+    const sec=document.createElement('section');
+    sec.innerHTML='<div class="pos-box"><label for="posq">ค้นหาเลขที่ตำแหน่ง ข้ามทุกหมวด</label>'+
+      '<input id="posq" type="search" inputmode="numeric" placeholder="เช่น 173750" autocomplete="off">'+
+      '<span class="hint" id="posHint">พิมพ์เลขที่ตำแหน่งอย่างน้อย 3 หลัก ระบบจะแสดงทุกหมวดที่มีเลขนี้ เช่น ตำแหน่งที่ทั้งปรับปรุงและเกลี่ยอัตรา</span></div><div id="posOut"></div>';
+    const inp=sec.querySelector('#posq'), out=sec.querySelector('#posOut'), hint=sec.querySelector('#posHint');
+    let t;
+    inp.oninput=()=>{ clearTimeout(t); t=setTimeout(run,120); };
+    function run(){
+      const q=inp.value.replace(/\s/g,'');
+      if(q.length<3){ out.innerHTML=''; hint.textContent='พิมพ์เลขที่ตำแหน่งอย่างน้อย 3 หลัก ระบบจะแสดงทุกหมวดที่มีเลขนี้ เช่น ตำแหน่งที่ทั้งปรับปรุงและเกลี่ยอัตรา'; return; }
+      let n=0, g=0;
+      const html=SHEETS.map(s=>{
+        const rows=s.rows.filter(r=>String(r.posno).indexOf(q)>=0); if(!rows.length)return '';
+        n+=rows.length; g++;
+        const cols=colsFor(rows).filter(c=>c.k!=='reason');
+        return '<div class="group"><h3>'+esc(s.name)+'<span class="n">'+fmt(rows.length)+' รายการ</span></h3><div class="shell"><table><thead><tr><th>ลำดับ</th>'+
+          cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml(rows,cols,'')+'</tbody></table></div></div>';
+      }).join('');
+      out.innerHTML=html||'<div class="empty">ไม่พบเลขที่ตำแหน่ง “'+esc(q)+'” ในทุกหมวด</div>';
+      hint.textContent=n?'พบ '+fmt(n)+' รายการ ใน '+g+' หมวด':'';
+      out.querySelectorAll('td.c-posno').forEach(td=>{ td.innerHTML=hl(td.textContent,q); });
+    }
+    return {el:sec,focus(){ setTimeout(()=>inp.focus(),0); }};
+  }
+
+  function openWith(i,q){
+    select(i);
+    search.value=q;
+    built[i].filter(q.toLowerCase());
+  }
+
+  function select(key){
+    active=key;
+    Object.keys(tabBtns).forEach(k=>{ const on=String(k)===String(key); tabBtns[k].classList.toggle('on',on); tabBtns[k].setAttribute('aria-selected',on); });
+    if(!built[key]){
+      built[key]=key==='overview'?buildOverview():key==='pos'?buildPos():buildSheet(key);
+      main.appendChild(built[key].el);
+    }
+    Object.keys(built).forEach(k=>{ built[k].el.hidden=String(k)!==String(key); });
+    search.value='';
+    if(key==='overview'){ search.disabled=true; search.placeholder='เลือกหมวดด้านบนเพื่อค้นหา...'; pill.textContent='รวม '+fmt(total)+' รายการ'; }
+    else if(key==='pos'){ search.disabled=true; search.placeholder='ใช้ช่องค้นหาด้านล่างสำหรับเลขที่ตำแหน่ง'; pill.textContent='ค้นหาข้ามทุกหมวด'; built.pos.focus(); }
+    else { search.disabled=false; search.placeholder='ค้นหาใน “'+SHEETS[key].name+'”...'; built[key].filter(''); }
+    tabBtns[key].scrollIntoView({block:'nearest',inline:'nearest'});
+    window.scrollTo(0,0);
+    try{ localStorage.setItem('vac69tab',String(key)); }catch(e){}
+  }
+
+  let st;
+  search.addEventListener('input',()=>{ clearTimeout(st); st=setTimeout(()=>{ if(typeof active==='number')built[active].filter(search.value.trim().toLowerCase()); },150); });
+
+  function init(data){
+    SHEETS.forEach(s=>s.rows=[]);
+    const byCat={}; SHEETS.forEach(s=>byCat[s.cat]=s);
+    data.forEach(r=>{
+      const s=byCat[r.cat]; if(!s)return;
+      r.no=s.rows.length+1; r.sheetName=s.name;
+      r.unitFull=[r.unit,r.dept].filter(Boolean).join('\n');
+      r.meetTxt=r.meet?('ครั้งที่ '+r.meet+'/2569'+(r.meetDate?'\n'+r.meetDate:'')):'';
+      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter].join(' ').toLowerCase();
+      s.rows.push(r);
+    });
+    total=data.length;
+    $('nCats').textContent=SHEETS.length;
+    main.innerHTML='';
+    makeTab('overview','ภาพรวม');
+    makeTab('pos','🔍 ค้นหาเลขที่ตำแหน่ง');
+    SHEETS.forEach((s,i)=>makeTab(i,esc(s.name),s.rows.length));
+    let start='overview';
+    try{ const v=localStorage.getItem('vac69tab'); if(v==='pos')start='pos'; else if(v!=null&&SHEETS[+v]&&v!=='overview')start=+v; }catch(e){}
+    select(start);
+  }
+
+  fetch('data.json').then(r=>{ if(!r.ok)throw new Error(r.status); return r.json(); }).then(init).catch(err=>{
+    main.innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ ('+esc(err.message)+') กรุณารีเฟรชหน้านี้</div>';
+    pill.textContent='โหลดไม่สำเร็จ';
+  });
+})();
+</script>

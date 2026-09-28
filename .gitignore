@@ -1,0 +1,5 @@
+# ไฟล์ต้นฉบับที่มีชื่อบุคคล — ห้ามขึ้น GitHub
+*.csv
+*.xlsx
+*.xls
+data.backup-*.json
