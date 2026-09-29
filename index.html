@@ -190,7 +190,9 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     {k:'cond',h:'เงื่อนไขในการดำรงตำแหน่ง'},
     {k:'result',h:'ผลการพิจารณาเขต',badge:true},
     {k:'meetTxt',h:'ครั้งที่ประชุม'},
-    {k:'letter',h:'หนังสือแจ้งผล',cls:'c-letter'}
+    {k:'letter',h:'หนังสือแจ้งผล',cls:'c-letter'},
+    {k:'order',h:'คำสั่ง',cls:'c-letter'},
+    {k:'effDate',h:'วันที่มีผล'}
   ];
   const PROVS=['เชียงใหม่','เชียงราย','ลำพูน','ลำปาง','แม่ฮ่องสอน','น่าน','พะเยา','แพร่'];
   const $=id=>document.getElementById(id);
@@ -361,7 +363,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
       r.no=s.rows.length+1; r.sheetName=s.name;
       r.unitFull=[r.unit,r.dept].filter(Boolean).join('\n');
       r.meetTxt=r.meet?('ครั้งที่ '+r.meet+'/2569'+(r.meetDate?'\n'+r.meetDate:'')):'';
-      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter].join(' ').toLowerCase();
+      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter,r.order,r.effDate].join(' ').toLowerCase();
       s.rows.push(r);
     });
     total=data.length;
