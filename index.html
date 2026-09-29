@@ -139,7 +139,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     <div class="brand">
       <h1>ทะเบียนคำขอใช้ตำแหน่งว่าง</h1>
       <span class="sub">คณะกรรมการบริหารทรัพยากรบุคคล เขตสุขภาพที่ 1 · ปี 2569 · <span id="nCats">10</span> หมวดข้อมูล</span>
-      <span class="sub">ข้อมูล ณ 26 กันยายน 2569</span>
+      <span class="sub">ข้อมูล ณ 29 กันยายน 2569 (ถึงการประชุมครั้งที่ 8/2569)</span>
     </div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -194,7 +194,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
   const badgeCls=t=>/ยกเลิก|ไม่เห็นชอบ|ไม่อนุมัติ/.test(t)?'bad':/เห็นชอบ|อนุมัติ/.test(t)?'good':'neutral';
   const isOk=r=>badgeCls(r.result)==='good', isBad=r=>badgeCls(r.result)==='bad';
 
-  let active='overview', total=0;
+  let active='overview', total=0, meetMin=1, meetMax=1;
   const built={};
   const tabBtns={};
   const search=$('search'), pill=$('pill'), main=$('main');
@@ -227,7 +227,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     const sec=document.createElement('section');
     const okAll=SHEETS.reduce((a,s)=>a+s.rows.filter(isOk).length,0);
     sec.innerHTML='<div class="total"><b class="num">'+fmt(total)+'</b><span>รายการทั้งหมด ใน '+SHEETS.length+' หมวด</span>'+
-      '<small>เห็นชอบ / อนุมัติ '+fmt(okAll)+' รายการ · การประชุมครั้งที่ 1/2569 – 7/2569 · คลิกการ์ดเพื่อดูรายการในหมวดนั้น</small></div>'+
+      '<small>เห็นชอบ / อนุมัติ '+fmt(okAll)+' รายการ · การประชุมครั้งที่ '+meetMin+'/2569 – '+meetMax+'/2569 · คลิกการ์ดเพื่อดูรายการในหมวดนั้น</small></div>'+
       '<div class="cards">'+SHEETS.map((s,i)=>{
         const ok=s.rows.filter(isOk).length, bad=s.rows.filter(isBad).length;
         return '<button type="button" class="card" data-i="'+i+'"><b>'+fmt(s.rows.length)+'</b><span class="l">'+esc(s.name)+'</span><span class="d">'+esc(s.cat)+'</span>'+
@@ -336,6 +336,8 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
       s.rows.push(r);
     });
     total=data.length;
+    const meets=data.map(r=>r.meet).filter(Boolean);
+    meetMin=Math.min(...meets); meetMax=Math.max(...meets);
     $('nCats').textContent=SHEETS.length;
     main.innerHTML='';
     makeTab('overview','ภาพรวม');
