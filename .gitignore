@@ -3,3 +3,5 @@
 *.xlsx
 *.xls
 data.backup-*.json
+# โน้ตส่วนตัวในโฟลเดอร์
+*.txt
