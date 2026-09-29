@@ -91,6 +91,11 @@ main{max-width:1400px;margin:0 auto;padding-block:18px 40px;padding-inline:16px;
 .matrix tr.hl th,.matrix tr.hl td{background:var(--accent-soft)}
 .mcell{font:inherit;font-variant-numeric:tabular-nums;background:none;border:0;color:var(--accent-strong);cursor:pointer;padding:2px 6px;border-radius:5px;text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:3px}
 .mcell:hover{background:var(--accent-soft)}
+.ocard{cursor:default}
+.ocard:hover{border-color:var(--border);transform:none}
+.ocard .l{font-weight:600}
+.ocard .split .mcell{font-size:12px;padding:3px 8px;background:var(--surface-alt);text-decoration:none}
+.ocard .split .mcell:hover{background:var(--accent-soft)}
 .zero{color:var(--border)}
 .sheet-head{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
 .pager{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-bottom:10px;font-size:13px;color:var(--text-muted)}
@@ -255,8 +260,21 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
         provs.map(x=>'<tr><th scope="row">'+esc(x.p)+'</th>'+SHEETS.map((s,i)=>{ const n=cnt(x.p,s); return '<td class="c-n">'+(n?'<button type="button" class="mcell" data-p="'+esc(x.p)+'" data-i="'+i+'">'+fmt(n)+'</button>':'<span class="zero">–</span>')+'</td>'; }).join('')+'<td class="c-n tot">'+fmt(x.n)+'</td></tr>').join('')+
         '<tr class="sum"><th scope="row">รวม</th>'+SHEETS.map(s=>'<td class="c-n">'+fmt(s.rows.length)+'</td>').join('')+'<td class="c-n tot">'+fmt(total)+'</td></tr>'+
       '</tbody></table></div>');
+    // จำนวนตามคำสั่ง
+    const byOrder={};
+    all.filter(r=>r.order).forEach(r=>{ const o=byOrder[r.order]||(byOrder[r.order]={order:r.order,eff:r.effDate,n:0,cats:{}}); o.n++; o.cats[r.sheetName]=(o.cats[r.sheetName]||0)+1; });
+    const orders=Object.values(byOrder).sort((a,b)=>b.n-a.n);
+    if(orders.length){
+      const withOrder=orders.reduce((a,o)=>a+o.n,0);
+      sec.insertAdjacentHTML('beforeend',
+        '<h2 class="sec-h">แยกตามคำสั่ง</h2><p class="sec-sub">มีคำสั่งแล้ว '+fmt(withOrder)+' รายการ จาก '+fmt(orders.length)+' คำสั่ง · คลิกชื่อหมวดเพื่อดูรายการของคำสั่งนั้น</p>'+
+        '<div class="cards">'+orders.map(o=>'<div class="card ocard"><b>'+fmt(o.n)+'</b><span class="l">'+esc(o.order)+'</span>'+
+          (o.eff?'<span class="d">มีผล '+esc(o.eff)+'</span>':'')+
+          '<span class="split">'+Object.entries(o.cats).map(([name,n])=>{ const i=SHEETS.findIndex(s=>s.name===name); return '<button type="button" class="mcell" data-i="'+i+'" data-o="'+esc(o.order)+'">'+esc(name)+' '+fmt(n)+'</button>'; }).join('')+'</span></div>').join('')+'</div>');
+    }
+    sec.querySelectorAll('.ocard .mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.o));
     sec.querySelectorAll('.card[data-i]').forEach(c=>c.onclick=()=>select(+c.dataset.i));
-    sec.querySelectorAll('.mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.p));
+    sec.querySelectorAll('.matrix .mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.p));
     sec.querySelectorAll('.pcard').forEach(c=>c.onclick=()=>{ const t=sec.querySelector('.matrix'); t.scrollIntoView({behavior:'smooth',block:'start'}); t.querySelectorAll('tbody tr').forEach(tr=>tr.classList.toggle('hl',tr.firstChild.textContent===c.dataset.p)); });
     return {el:sec};
   }
