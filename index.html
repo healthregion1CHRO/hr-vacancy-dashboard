@@ -35,6 +35,7 @@
   --neutral-bg:#22302f; --neutral-text:#93a7ab; --shadow:none;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--text);font-family:"Noto Sans Thai","Sarabun",Tahoma,sans-serif;font-size:14px;line-height:1.55}
 h1,h2{font-family:"Sarabun","Noto Sans Thai",Tahoma,sans-serif;text-wrap:balance;margin:0}
 .num{font-variant-numeric:tabular-nums}
@@ -92,6 +93,14 @@ main{max-width:1400px;margin:0 auto;padding-block:18px 40px;padding-inline:16px;
 .mcell:hover{background:var(--accent-soft)}
 .zero{color:var(--border)}
 .sheet-head{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.pager{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-bottom:10px;font-size:13px;color:var(--text-muted)}
+.pager select{font:inherit;font-size:13px;padding:5px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);margin:0 4px;cursor:pointer}
+.pager select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pager .nav{display:flex;align-items:center;gap:8px;margin-left:auto}
+.pager .nav button{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--accent-strong);cursor:pointer}
+.pager .nav button:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.pager .nav button:disabled{opacity:.45;cursor:default}
+@media (max-width:640px){ .pager .nav{margin-left:0;width:100%;justify-content:space-between} }
 .sheet-head h2{font-size:18px;font-weight:700}
 .sheet-head .meta{font-size:12.5px;color:var(--text-muted)}
 .shell{overflow:auto;max-height:calc(100vh - 230px);min-height:240px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
@@ -254,18 +263,42 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     return {el:sec};
   }
 
+  // จำนวนรายการต่อหน้า (ใช้ร่วมกันทุกหมวด) 0 = ทั้งหมด
+  const SIZES=[10,20,30,40,50,100,0];
+  let pageSize=50;
+  try{ const v=localStorage.getItem('vac69size'); if(v!==null&&SIZES.includes(+v))pageSize=+v; }catch(e){}
+
   function buildSheet(i){
     const s=SHEETS[i], cols=colsFor(s.rows);
     const sec=document.createElement('section');
     sec.innerHTML='<div class="sheet-head"><h2>'+esc(s.name)+'</h2><div class="meta">'+esc(s.cat)+' · '+fmt(s.rows.length)+' รายการ</div></div>'+
+      '<div class="pager"><label>แสดง <select aria-label="จำนวนรายการต่อหน้า">'+SIZES.map(n=>'<option value="'+n+'">'+(n?n:'ทั้งหมด')+'</option>').join('')+'</select> รายการ</label>'+
+      '<span class="range num"></span><span class="nav"><button type="button" data-d="-1" aria-label="หน้าก่อนหน้า">‹ ก่อนหน้า</button><span class="pg num"></span><button type="button" data-d="1" aria-label="หน้าถัดไป">ถัดไป ›</button></span></div>'+
       '<div class="shell"><table><thead><tr><th>ลำดับ</th>'+cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody></tbody></table>'+
       '<div class="empty" hidden>ไม่พบรายการที่ตรงกับคำค้นหา ลองใช้คำที่สั้นลง</div></div>';
-    const tb=sec.querySelector('tbody'), em=sec.querySelector('.empty');
-    const obj={el:sec,filter(q){
-      // พิมพ์ชื่อจังหวัดตรงตัว = กรองตามจังหวัด
-      const rows=!q?s.rows:PROVS.includes(q)?s.rows.filter(r=>r.prov===q):s.rows.filter(r=>r._s.indexOf(q)>=0);
-      tb.innerHTML=rowsHtml(rows,cols,q);
+    const tb=sec.querySelector('tbody'), em=sec.querySelector('.empty'), shell=sec.querySelector('.shell');
+    const sel=sec.querySelector('.pager select'), range=sec.querySelector('.pager .range'), pg=sec.querySelector('.pager .pg');
+    const [prev,next]=sec.querySelectorAll('.pager .nav button');
+    let rows=s.rows, q='', page=1;
+    function render(){
+      const size=pageSize||rows.length||1, pages=Math.max(1,Math.ceil(rows.length/size));
+      page=Math.min(Math.max(1,page),pages);
+      const from=(page-1)*size, view=rows.slice(from,from+size);
+      tb.innerHTML=rowsHtml(view,cols,q);
       em.hidden=rows.length>0;
+      sel.value=String(pageSize);
+      range.textContent=rows.length?fmt(from+1)+'–'+fmt(from+view.length)+' จาก '+fmt(rows.length):'';
+      pg.textContent='หน้า '+fmt(page)+' / '+fmt(pages);
+      prev.disabled=page<=1; next.disabled=page>=pages;
+      sec.querySelector('.pager .nav').hidden=pages<=1;
+    }
+    sel.onchange=()=>{ pageSize=+sel.value; page=1; try{ localStorage.setItem('vac69size',String(pageSize)); }catch(e){} render(); };
+    [prev,next].forEach(b=>b.onclick=()=>{ page+=+b.dataset.d; render(); shell.scrollTop=0; sec.scrollIntoView({block:'start'}); });
+    const obj={el:sec,filter(query){
+      q=query;
+      // พิมพ์ชื่อจังหวัดตรงตัว = กรองตามจังหวัด
+      rows=!q?s.rows:PROVS.includes(q)?s.rows.filter(r=>r.prov===q):s.rows.filter(r=>r._s.indexOf(q)>=0);
+      page=1; render();
       pill.textContent=q?fmt(rows.length)+' / '+fmt(s.rows.length)+' รายการ':fmt(s.rows.length)+' รายการ';
     }};
     obj.filter('');
