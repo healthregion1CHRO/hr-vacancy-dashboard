@@ -179,7 +179,9 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     {cat:'จ้าง/เปลี่ยนตำแหน่ง พกส.', name:'จ้าง (พกส)'},
     {cat:'พกส. เข้าสู่สายงานผู้ช่วย', name:'จ้าง (พกส) (ผู้ช่วย)'},
     {cat:'เปลี่ยนประเภทการจ้าง', name:'เปลี่ยนประเภทการจ้าง'},
-    {cat:'จ้าง/เปลี่ยนตำแหน่ง ลจช.', name:'จ้าง (ลจช)'}
+    {cat:'จ้าง/เปลี่ยนตำแหน่ง ลจช.', name:'จ้าง (ลจช)'},
+    // ไม่ผ่านการประชุม มีเฉพาะเลขที่ตำแหน่ง/คำสั่ง/วันที่มีผล — ไม่นับในตารางจังหวัด
+    {cat:'คำสั่งย้าย/รับโอน (ไม่ต้องขอใช้ตำแหน่ง)', name:'คำสั่งย้าย/รับโอน', orderOnly:true}
   ];
   // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล)
   const COLS=[
@@ -243,22 +245,25 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
       '<div class="cards">'+SHEETS.map((s,i)=>{
         const ok=s.rows.filter(isOk).length, bad=s.rows.filter(isBad).length;
         return '<button type="button" class="card" data-i="'+i+'"><b>'+fmt(s.rows.length)+'</b><span class="l">'+esc(s.name)+'</span><span class="d">'+esc(s.cat)+'</span>'+
-          '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(ok)+'</span>'+(bad?'<span class="r">ยกเลิก '+fmt(bad)+'</span>':'')+'</span></button>';
+          (s.orderOnly?'<span class="split"><span>ไม่ต้องขอใช้ตำแหน่ง</span></span></button>':
+          '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(ok)+'</span>'+(bad?'<span class="r">ยกเลิก '+fmt(bad)+'</span>':'')+'</span></button>');
       }).join('')+'</div>';
     // ภาพรวมรายจังหวัด
     const all=SHEETS.flatMap(s=>s.rows);
     const provs=PROVS.map(p=>{ const rs=all.filter(r=>r.prov===p); return {p,n:rs.length,ok:rs.filter(isOk).length,bad:rs.filter(isBad).length,units:new Set(rs.map(r=>r.unit)).size}; }).sort((a,b)=>b.n-a.n);
     const max=Math.max(1,...provs.map(x=>x.n));
     const cnt=(p,s)=>s.rows.filter(r=>r.prov===p).length;
+    const MS=SHEETS.map((s,i)=>({s,i})).filter(x=>!x.s.orderOnly);
+    const mTotal=MS.reduce((a,x)=>a+x.s.rows.length,0);
     sec.insertAdjacentHTML('beforeend',
       '<h2 class="sec-h">แยกตามจังหวัด</h2>'+
       '<div class="cards">'+provs.map(x=>'<button type="button" class="card pcard" data-p="'+esc(x.p)+'"><span class="l"><b>'+fmt(x.n)+'</b> '+esc(x.p)+'</span>'+
         '<span class="pbar"><i style="width:'+(x.n/max*100)+'%"></i></span>'+
         '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(x.ok)+'</span>'+(x.bad?'<span class="r">ยกเลิก '+fmt(x.bad)+'</span>':'')+'<span>'+fmt(x.units)+' หน่วยงาน</span></span></button>').join('')+'</div>'+
       '<h2 class="sec-h">จังหวัด × หมวด</h2><p class="sec-sub">ตัวเลขคือจำนวนรายการ คลิกตัวเลขเพื่อเปิดหมวดนั้นพร้อมกรองจังหวัด</p>'+
-      '<div class="shell matrix"><table><thead><tr><th>จังหวัด</th>'+SHEETS.map((s,i)=>'<th title="'+esc(s.cat)+'">'+esc(s.name)+'</th>').join('')+'<th>รวม</th></tr></thead><tbody>'+
-        provs.map(x=>'<tr><th scope="row">'+esc(x.p)+'</th>'+SHEETS.map((s,i)=>{ const n=cnt(x.p,s); return '<td class="c-n">'+(n?'<button type="button" class="mcell" data-p="'+esc(x.p)+'" data-i="'+i+'">'+fmt(n)+'</button>':'<span class="zero">–</span>')+'</td>'; }).join('')+'<td class="c-n tot">'+fmt(x.n)+'</td></tr>').join('')+
-        '<tr class="sum"><th scope="row">รวม</th>'+SHEETS.map(s=>'<td class="c-n">'+fmt(s.rows.length)+'</td>').join('')+'<td class="c-n tot">'+fmt(total)+'</td></tr>'+
+      '<div class="shell matrix"><table><thead><tr><th>จังหวัด</th>'+MS.map(({s})=>'<th title="'+esc(s.cat)+'">'+esc(s.name)+'</th>').join('')+'<th>รวม</th></tr></thead><tbody>'+
+        provs.map(x=>'<tr><th scope="row">'+esc(x.p)+'</th>'+MS.map(({s,i})=>{ const n=cnt(x.p,s); return '<td class="c-n">'+(n?'<button type="button" class="mcell" data-p="'+esc(x.p)+'" data-i="'+i+'">'+fmt(n)+'</button>':'<span class="zero">–</span>')+'</td>'; }).join('')+'<td class="c-n tot">'+fmt(x.n)+'</td></tr>').join('')+
+        '<tr class="sum"><th scope="row">รวม</th>'+MS.map(({s})=>'<td class="c-n">'+fmt(s.rows.length)+'</td>').join('')+'<td class="c-n tot">'+fmt(mTotal)+'</td></tr>'+
       '</tbody></table></div>');
     // จำนวนตามคำสั่ง
     const byOrder={};
