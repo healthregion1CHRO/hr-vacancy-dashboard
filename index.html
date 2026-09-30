@@ -267,7 +267,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 16px 28px;text-align:center;font
     if(orders.length){
       const withOrder=orders.reduce((a,o)=>a+o.n,0);
       sec.insertAdjacentHTML('afterbegin',
-        '<h2 class="sec-h" style="margin-top:0">แยกตามคำสั่ง</h2><p class="sec-sub">มีคำสั่งแล้ว '+fmt(withOrder)+' รายการ จาก '+fmt(orders.length)+' คำสั่ง · คลิกชื่อหมวดเพื่อดูรายการของคำสั่งนั้น</p>'+
+        '<h2 class="sec-h" style="margin-top:0">แยกตามคำสั่ง ย้าย/ปฏิบัติราชการ/รับโอน/ให้โอน</h2><p class="sec-sub">มีคำสั่งแล้ว '+fmt(withOrder)+' รายการ จาก '+fmt(orders.length)+' คำสั่ง · คลิกชื่อหมวดเพื่อดูรายการของคำสั่งนั้น</p>'+
         '<div class="cards">'+orders.map(o=>'<div class="card ocard"><b>'+fmt(o.n)+'</b><span class="l">'+esc(o.order)+'</span>'+
           (o.eff?'<span class="d">มีผล '+esc(o.eff)+'</span>':'')+
           '<span class="split">'+Object.entries(o.cats).map(([name,n])=>{ const i=SHEETS.findIndex(s=>s.name===name); return '<button type="button" class="mcell" data-i="'+i+'" data-o="'+esc(o.order)+'">'+esc(name)+' '+fmt(n)+'</button>'; }).join('')+'</span></div>').join('')+'</div><div style="height:24px"></div>');
