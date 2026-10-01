@@ -75,7 +75,8 @@ main{max-width:1400px;margin:0 auto;padding-block:18px 40px;padding-inline:16px;
 .card .l{font-size:13px;color:var(--text)}
 .card .d{font-size:12px;color:var(--text-muted);line-height:1.4}
 .card .split{display:flex;gap:10px;font-size:11.5px;color:var(--text-muted);margin-top:2px}
-.card .split .g{color:var(--good-text)} .card .split .r{color:var(--bad-text)}
+.card .split .g{color:var(--good-text);font-weight:700} .card .split .r{color:var(--bad-text);font-weight:700}
+.card.oo .l,.mcell.oo{font-weight:700}
 
 .sec-h{font-size:17px;font-weight:700;margin:28px 0 10px}
 .sec-sub{margin:-6px 0 10px;font-size:12.5px;color:var(--text-muted)}
@@ -126,8 +127,8 @@ tbody tr:hover td{background:var(--surface-alt)}
 mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
 .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.badge.good{background:var(--good-bg);color:var(--good-text)}
-.badge.bad{background:var(--bad-bg);color:var(--bad-text)}
+.badge.good{background:var(--good-bg);color:var(--good-text);font-weight:700}
+.badge.bad{background:var(--bad-bg);color:var(--bad-text);font-weight:700}
 .badge.neutral{background:var(--neutral-bg);color:var(--neutral-text)}
 .prov{display:inline-block;font-size:11.5px;padding:0 7px;border-radius:5px;background:var(--surface-alt);color:var(--text-muted);margin-bottom:2px}
 .empty{padding:40px 16px;text-align:center;color:var(--text-muted)}
@@ -259,7 +260,7 @@ header.top{border-top:4px solid var(--brand)}
       '<small>เห็นชอบ / อนุมัติ '+fmt(okAll)+' รายการ'+(meetMax?' · การประชุมครั้งที่ '+meetMin+'/'+YEAR+' – '+meetMax+'/'+YEAR:'')+' · คลิกการ์ดเพื่อดูรายการในหมวดนั้น</small></div>'+
       '<div class="cards">'+SHEETS.map((s,i)=>{
         const ok=s.rows.filter(isOk).length, bad=s.rows.filter(isBad).length;
-        return '<button type="button" class="card" data-i="'+i+'"><b>'+fmt(s.rows.length)+'</b><span class="l">'+esc(s.name)+'</span><span class="d">'+esc(s.cat)+'</span>'+
+        return '<button type="button" class="card'+(s.orderOnly?' oo':'')+'" data-i="'+i+'"><b>'+fmt(s.rows.length)+'</b><span class="l">'+esc(s.name)+'</span><span class="d">'+esc(s.cat)+'</span>'+
           (s.orderOnly?'<span class="split"><span>ไม่ต้องขอใช้ตำแหน่ง</span></span></button>':
           '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(ok)+'</span>'+(bad?'<span class="r">ยกเลิก '+fmt(bad)+'</span>':'')+'</span></button>');
       }).join('')+'</div>';
@@ -290,7 +291,7 @@ header.top{border-top:4px solid var(--brand)}
         '<h2 class="sec-h" style="margin-top:0">แยกตามคำสั่ง ย้าย/ปฏิบัติราชการ/รับโอน/ให้โอน</h2><p class="sec-sub">มีคำสั่งแล้ว '+fmt(withOrder)+' รายการ จาก '+fmt(orders.length)+' คำสั่ง · คลิกชื่อหมวดเพื่อดูรายการของคำสั่งนั้น</p>'+
         '<div class="cards">'+orders.map(o=>'<div class="card ocard"><b>'+fmt(o.n)+'</b><span class="l">'+esc(o.order)+'</span>'+
           (o.eff?'<span class="d">มีผล '+esc(o.eff)+'</span>':'')+
-          '<span class="split">'+Object.entries(o.cats).map(([name,n])=>{ const i=SHEETS.findIndex(s=>s.name===name); return '<button type="button" class="mcell" data-i="'+i+'" data-o="'+esc(o.order)+'">'+esc(name)+' '+fmt(n)+'</button>'; }).join('')+'</span></div>').join('')+'</div><div style="height:24px"></div>');
+          '<span class="split">'+Object.entries(o.cats).map(([name,n])=>{ const i=SHEETS.findIndex(s=>s.name===name); return '<button type="button" class="mcell'+(SHEETS[i]&&SHEETS[i].orderOnly?' oo':'')+'" data-i="'+i+'" data-o="'+esc(o.order)+'">'+esc(name)+' '+fmt(n)+'</button>'; }).join('')+'</span></div>').join('')+'</div><div style="height:24px"></div>');
     }
     sec.querySelectorAll('.ocard .mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.o));
     sec.querySelectorAll('.card[data-i]').forEach(c=>c.onclick=()=>select(+c.dataset.i));
