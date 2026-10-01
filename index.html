@@ -275,7 +275,7 @@ header.top{border-top:4px solid var(--brand)}
       '<h2 class="sec-h">แยกตามจังหวัด</h2>'+
       '<div class="cards">'+provs.map(x=>'<button type="button" class="card pcard" data-p="'+esc(x.p)+'"><span class="l"><b>'+fmt(x.n)+'</b> '+esc(x.p)+'</span>'+
         '<span class="pbar"><i style="width:'+(x.n/max*100)+'%"></i></span>'+
-        '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(x.ok)+'</span>'+(x.bad?'<span class="r">ยกเลิก '+fmt(x.bad)+'</span>':'')+'<span>'+fmt(x.units)+' หน่วยงาน</span></span></button>').join('')+'</div>'+
+        '<span class="split"><span class="g">เห็นชอบ/อนุมัติ '+fmt(x.ok)+'</span>'+(x.bad?'<span class="r">ยกเลิก '+fmt(x.bad)+'</span>':'')+'</span></button>').join('')+'</div>'+
       '<h2 class="sec-h">จังหวัด × หมวด</h2><p class="sec-sub">ตัวเลขคือจำนวนรายการ คลิกตัวเลขเพื่อเปิดหมวดนั้นพร้อมกรองจังหวัด</p>'+
       '<div class="shell matrix"><table><thead><tr><th>จังหวัด</th>'+MS.map(({s})=>'<th title="'+esc(s.cat)+'">'+esc(s.name)+'</th>').join('')+'<th>รวม</th></tr></thead><tbody>'+
         provs.map(x=>'<tr><th scope="row">'+esc(x.p)+'</th>'+MS.map(({s,i})=>{ const n=cnt(x.p,s); return '<td class="c-n">'+(n?'<button type="button" class="mcell" data-p="'+esc(x.p)+'" data-i="'+i+'">'+fmt(n)+'</button>':'<span class="zero">–</span>')+'</td>'; }).join('')+'<td class="c-n tot">'+fmt(x.n)+'</td></tr>').join('')+
