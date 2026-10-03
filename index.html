@@ -82,6 +82,7 @@ main{max-width:1400px;margin:0 auto;padding-block:18px 40px;padding-inline:16px;
 .sec-sub{margin:-6px 0 10px;font-size:12.5px;color:var(--text-muted)}
 .pcard .l{font-size:15px;font-weight:600;display:flex;align-items:baseline;gap:8px}
 .pcard .l b{font-size:26px}
+.pcard.on{border-color:var(--accent-strong);box-shadow:0 0 0 3px var(--accent-strong),var(--shadow)}
 .pbar{height:6px;border-radius:3px;background:var(--surface-alt);overflow:hidden}
 .pbar i{display:block;height:100%;background:var(--accent)}
 .card .split{flex-wrap:wrap}
@@ -296,7 +297,7 @@ header.top{border-top:4px solid var(--brand)}
     sec.querySelectorAll('.ocard .mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.o));
     sec.querySelectorAll('.card[data-i]').forEach(c=>c.onclick=()=>select(+c.dataset.i));
     sec.querySelectorAll('.matrix .mcell').forEach(b=>b.onclick=()=>openWith(+b.dataset.i,b.dataset.p));
-    sec.querySelectorAll('.pcard').forEach(c=>c.onclick=()=>{ const t=sec.querySelector('.matrix'); t.scrollIntoView({behavior:'smooth',block:'start'}); t.querySelectorAll('tbody tr').forEach(tr=>tr.classList.toggle('hl',tr.firstChild.textContent===c.dataset.p)); });
+    sec.querySelectorAll('.pcard').forEach(c=>c.onclick=()=>{ sec.querySelectorAll('.pcard').forEach(x=>x.classList.toggle('on',x===c)); const t=sec.querySelector('.matrix'); t.scrollIntoView({behavior:'smooth',block:'start'}); t.querySelectorAll('tbody tr').forEach(tr=>tr.classList.toggle('hl',tr.firstChild.textContent===c.dataset.p)); });
     return {el:sec};
   }
 
