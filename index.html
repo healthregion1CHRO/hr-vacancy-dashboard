@@ -231,9 +231,10 @@ header.top{border-top:4px solid var(--brand)}
   const search=$('search'), pill=$('pill'), main=$('main');
 
   function hl(text,q){
-    const s=esc(text); if(!q)return s;
-    const i=s.toLowerCase().indexOf(esc(q).toLowerCase()); if(i<0)return s;
-    return s.slice(0,i)+'<mark>'+s.slice(i,i+esc(q).length)+'</mark>'+s.slice(i+esc(q).length);
+    // หาคำในข้อความดิบก่อน escape — กันการแทรก <mark> กลาง &amp; ฯลฯ
+    const s=String(text==null?'':text); if(!q)return esc(s);
+    const i=s.toLowerCase().indexOf(q.toLowerCase()); if(i<0)return esc(s);
+    return esc(s.slice(0,i))+'<mark>'+esc(s.slice(i,i+q.length))+'</mark>'+esc(s.slice(i+q.length));
   }
   function cell(r,c,q){
     let v=r[c.k]; if(v==null||v==='')return '<td class="'+(c.cls||'')+'">'+(c.cls==='c-n'?'–':'')+'</td>';
