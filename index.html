@@ -455,7 +455,6 @@ header.top{border-top:4px solid var(--brand)}
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
     YEAR=y.year;
     $('asOf').textContent=y.asOf||'';
-    document.title='ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง ปี '+YEAR;
     return fetchYear(y).then(d=>init(d,y));
   }).catch(err=>{
     main.innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ ('+esc(err.message)+') กรุณารีเฟรชหน้านี้</div>';
