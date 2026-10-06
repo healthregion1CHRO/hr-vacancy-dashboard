@@ -52,7 +52,11 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;backgroun
 .pill{font-size:12.5px;color:var(--accent-strong);background:var(--accent-soft);border-radius:999px;padding:6px 12px;font-weight:600;white-space:nowrap}
 
 nav.tabs{background:var(--bg);border-bottom:1px solid var(--border);padding:0 16px}
-.tabs-in{max-width:1400px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:thin}
+.tabs-bar{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.tabs-in{flex:1 1 auto;min-width:0;display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:thin}
+.yrpick{flex:0 0 auto;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-muted);padding-left:10px;border-left:1px solid var(--border)}
+.yrpick select{font:inherit;font-weight:700;color:var(--on-accent);background:var(--accent);border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+.yrpick select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tab{flex:0 0 auto;font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;border:0;background:transparent;color:var(--text-muted);cursor:pointer;white-space:nowrap}
 .tab:hover{background:var(--surface-alt);color:var(--text)}
 .tab.on{background:var(--accent);color:var(--on-accent)}
@@ -139,7 +143,6 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .pos-yr{display:inline-flex;align-items:center;gap:8px;font-weight:600}
 .pos-yr select{font:inherit;font-size:15px;padding:9px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);cursor:pointer}
 .pos-yr select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-footer .yrs a{color:var(--accent-strong);font-weight:600;margin:0 4px}
 .group{margin-bottom:18px}
 .group h3{font-size:14px;margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
 .group h3 .n{font-size:12px;color:var(--text-muted);font-weight:500}
@@ -179,9 +182,9 @@ header.top{border-top:4px solid var(--brand)}
     <span class="pill num" id="pill">กำลังโหลด…</span>
   </div>
 </header>
-<nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-in" id="tabs" role="tablist"></div></nav>
+<nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-bar"><div class="tabs-in" id="tabs" role="tablist"></div><label class="yrpick" id="yrPick" hidden>ปี <select id="yrSel" aria-label="เลือกปีที่แสดง"></select></label></div></nav>
 <main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
-<footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง<span class="yrs" id="yrLinks"></span></footer>
+<footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง</footer>
 
 <script>
 (function(){
@@ -429,6 +432,7 @@ header.top{border-top:4px solid var(--brand)}
       r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter,r.order,r.effDate].join(' ').toLowerCase();
       s.rows.push(r);
     });
+    sheets.total=data.length;
     return sheets;
   }
   const raw={}, prepared={};
@@ -439,13 +443,16 @@ header.top{border-top:4px solid var(--brand)}
     return prepared[y.year]?Promise.resolve(prepared[y.year]):fetchYear(y).then(d=>prepared[y.year]||(prepared[y.year]=prepare(d,y)));
   }
 
-  function init(data,y){
-    SHEETS=prepared[y.year]=prepare(data,y);
-    total=data.length;
-    const meets=data.map(r=>r.meet).filter(Boolean);
-    if(meets.length){ meetMin=Math.min(...meets); meetMax=Math.max(...meets); }
+  function init(sheets){
+    SHEETS=sheets;
+    total=sheets.total;
+    const meets=sheets.flatMap(s=>s.rows.map(r=>r.meet)).filter(Boolean);
+    meetMin=meets.length?Math.min(...meets):0; meetMax=meets.length?Math.max(...meets):0;
     $('nCats').textContent=SHEETS.length;
-    main.innerHTML='';
+    // เปลี่ยนปี = สร้างแท็บและหน้าใหม่ทั้งหมด
+    Object.keys(built).forEach(k=>delete built[k]);
+    Object.keys(tabBtns).forEach(k=>delete tabBtns[k]);
+    $('tabs').innerHTML=''; main.innerHTML='';
     makeTab('overview','ภาพรวม');
     makeTab('pos','🔍 ค้นหาเลขที่ตำแหน่ง');
     SHEETS.forEach((s,i)=>makeTab(i,esc(s.name),s.rows.length));
@@ -453,17 +460,29 @@ header.top{border-top:4px solid var(--brand)}
     try{ const v=localStorage.getItem('vac69tab'); if(v==='pos')start='pos'; else if(v!=null&&SHEETS[+v]&&v!=='overview')start=+v; }catch(e){}
     select(start);
   }
+  function showYear(y){
+    YEAR=y.year;
+    $('asOf').textContent=y.asOf||'';
+    $('yrSel').value=y.year;
+    return loadYear(y).then(init);
+  }
 
-  // years.json = รายการปีที่มีข้อมูล · เลือกปีด้วย ?y=2569 (ไม่ระบุ = ปีล่าสุด)
+  // years.json = รายการปีที่มีข้อมูล · ?y=2569 เปิดปีนั้น (ไม่ระบุ = ปีล่าสุด)
+  // มีหลายปี = แสดงตัวเลือกปีท้ายแถบแท็บ สลับปีในหน้าเดียวโดยไม่โหลดหน้าใหม่
   fetch('years.json').then(r=>{ if(!r.ok)throw new Error(r.status); return r.json(); }).then(list=>{
     YEARS=list.slice().sort((a,b)=>+b.year-+a.year);
     const want=new URLSearchParams(location.search).get('y');
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
-    YEAR=y.year;
-    $('asOf').textContent=y.asOf||'';
-    // ท้ายหน้า: ลิงก์ดูข้อมูลทั้งปีของปีอื่น (มีหลายปีเท่านั้น)
-    if(YEARS.length>1)$('yrLinks').innerHTML='<br>ดูข้อมูลทั้งปี:'+YEARS.map(x=>x===y?'<b> '+esc(x.year)+' </b>':'<a href="?'+(x===YEARS[0]?'':'y='+esc(x.year))+'">'+esc(x.year)+'</a>').join('·');
-    return fetchYear(y).then(d=>init(d,y));
+    const ysel=$('yrSel');
+    ysel.innerHTML=YEARS.map(x=>'<option value="'+esc(x.year)+'">'+esc(x.year)+(x===YEARS[0]?' (ล่าสุด)':'')+'</option>').join('');
+    $('yrPick').hidden=YEARS.length<2;
+    ysel.onchange=()=>{
+      const ny=YEARS.find(x=>x.year===ysel.value);
+      try{ const p=new URLSearchParams(location.search); if(ny===YEARS[0])p.delete('y'); else p.set('y',ny.year); history.replaceState(null,'',location.pathname+(p.toString()?'?'+p:'')); }catch(e){}
+      main.innerHTML='<div class="empty">กำลังโหลดข้อมูลปี '+esc(ny.year)+'…</div>';
+      showYear(ny).catch(err=>{ main.innerHTML='<div class="empty">โหลดข้อมูลปี '+esc(ny.year)+' ไม่สำเร็จ ('+esc(err.message)+')</div>'; });
+    };
+    return showYear(y);
   }).catch(err=>{
     main.innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ ('+esc(err.message)+') กรุณารีเฟรชหน้านี้</div>';
     pill.textContent='โหลดไม่สำเร็จ';
