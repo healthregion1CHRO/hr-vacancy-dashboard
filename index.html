@@ -194,6 +194,7 @@ header.top{border-top:4px solid var(--brand)}
     {cat:'ยุบกำหนดตำแหน่งสูงขึ้น ขรก.', name:'ปรับปรุง (ขรก) (ยุบ)'},
     {cat:'เกลี่ยอัตรา ขรก. (มีคนครอง)', name:'เกลี่ยอัตราตัดโอน (ขรก)'},
     {cat:'เกลี่ยอัตรา ขรก. (ตำแหน่งว่าง)', name:'เกลี่ยอัตราตัดโอน (ขรก) ต.ว่าง'},
+    {cat:'เกลี่ยอัตรา ขรก. แพทย์ประจำบ้าน (ขึ้นชั้นปีที่ 2)', name:'เกลี่ยอัตราตัดโอนแพทย์ประจำบ้าน'},
     {cat:'ขอใช้ตำแหน่ง ขรก.', name:'ขอใช้ ขรก.'},
     {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พรก'},
     {cat:'จ้าง/เปลี่ยนตำแหน่ง พกส.', name:'จ้าง (พกส)'},
@@ -318,7 +319,7 @@ header.top{border-top:4px solid var(--brand)}
       '<div class="pager"><label>แสดง <select aria-label="จำนวนรายการต่อหน้า">'+SIZES.map(n=>'<option value="'+n+'">'+(n?n:'ทั้งหมด')+'</option>').join('')+'</select> รายการ</label>'+
       '<span class="range num"></span><span class="nav"><button type="button" data-d="-1" aria-label="หน้าก่อนหน้า">‹ ก่อนหน้า</button><span class="pg num"></span><button type="button" data-d="1" aria-label="หน้าถัดไป">ถัดไป ›</button></span></div>'+
       '<div class="shell"><table><thead><tr><th>ลำดับ</th>'+cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody></tbody></table>'+
-      '<div class="empty" hidden>ไม่พบรายการที่ตรงกับคำค้นหา ลองใช้คำที่สั้นลง</div></div>';
+      '<div class="empty" hidden>'+(s.rows.length?'ไม่พบรายการที่ตรงกับคำค้นหา ลองใช้คำที่สั้นลง':'ยังไม่มีรายการในหมวดนี้')+'</div></div>';
     const tb=sec.querySelector('tbody'), em=sec.querySelector('.empty'), shell=sec.querySelector('.shell');
     const sel=sec.querySelector('.pager select'), range=sec.querySelector('.pager .range'), pg=sec.querySelector('.pager .pg');
     const [prev,next]=sec.querySelectorAll('.pager .nav button');
