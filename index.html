@@ -44,8 +44,6 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;backgroun
 .brand h1{font-size:20px;font-weight:700}
 .brand .sub{font-size:12.5px;color:var(--text-muted)}
 .brand .h1sub{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
-.yr select{font:inherit;font-weight:700;color:var(--text);background:var(--surface-alt);border:1px solid var(--border);border-radius:6px;padding:1px 4px;cursor:pointer}
-.yr select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .pos-box .allyr{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:400;cursor:pointer;align-self:flex-start}
 .pos-box .allyr input{width:16px;height:16px;padding:0;margin:0;accent-color:var(--accent)}
 .search{position:relative;flex:1 1 260px;max-width:520px}
@@ -168,7 +166,7 @@ header.top{border-top:4px solid var(--brand)}
     <div class="brand">
       <h1>ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง</h1>
       <span class="h1sub">(ข้าราชการ พนักงานราชการ พนักงานกระทรวงสาธารณสุข และลูกจ้างชั่วคราว)</span>
-      <span class="sub">คณะอนุกรรมการบริหารทรัพยากรบุคคล เขตสุขภาพที่ 1 · <span class="yr" id="yearBox">ปี <span id="yearTxt"></span></span> · <span id="nCats">10</span> หมวดข้อมูล</span>
+      <span class="sub">คณะอนุกรรมการบริหารทรัพยากรบุคคล เขตสุขภาพที่ 1 · <span id="nCats">10</span> หมวดข้อมูล</span>
       <span class="sub" id="asOf">&nbsp;</span>
     </div>
     <div class="search">
@@ -456,12 +454,6 @@ header.top{border-top:4px solid var(--brand)}
     const want=new URLSearchParams(location.search).get('y');
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
     YEAR=y.year;
-    // มีปีเดียว = แสดงเป็นข้อความ · หลายปี = แสดงตัวเลือกปี
-    if(YEARS.length>1){
-      $('yearBox').innerHTML='<label>ปี <select id="year" aria-label="เลือกปี">'+YEARS.map(x=>'<option value="'+esc(x.year)+'"'+(x===y?' selected':'')+'>'+esc(x.year)+'</option>').join('')+'</select></label>';
-      const ysel=$('year');
-      ysel.onchange=()=>{ const p=new URLSearchParams(location.search); if(ysel.value===YEARS[0].year)p.delete('y'); else p.set('y',ysel.value); location.search=p.toString(); };
-    } else $('yearTxt').textContent=y.year;
     $('asOf').textContent=y.asOf||'';
     document.title='ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง ปี '+YEAR;
     return fetchYear(y).then(d=>init(d,y));
