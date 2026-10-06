@@ -135,6 +135,11 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .pos-box .hint{font-size:12.5px;color:var(--text-muted)}
 .pos-box input{font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);max-width:360px;width:100%;font-variant-numeric:tabular-nums}
 .pos-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.pos-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.pos-yr{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.pos-yr select{font:inherit;font-size:15px;padding:9px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text);cursor:pointer}
+.pos-yr select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+footer .yrs a{color:var(--accent-strong);font-weight:600;margin:0 4px}
 .group{margin-bottom:18px}
 .group h3{font-size:14px;margin:0 0 8px;display:flex;gap:8px;align-items:baseline}
 .group h3 .n{font-size:12px;color:var(--text-muted);font-weight:500}
@@ -176,7 +181,7 @@ header.top{border-top:4px solid var(--brand)}
 </header>
 <nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-in" id="tabs" role="tablist"></div></nav>
 <main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
-<footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง</footer>
+<footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง<span class="yrs" id="yrLinks"></span></footer>
 
 <script>
 (function(){
@@ -343,25 +348,45 @@ header.top{border-top:4px solid var(--brand)}
   function buildPos(){
     const sec=document.createElement('section');
     const HINT='พิมพ์เลขที่ตำแหน่งอย่างน้อย 3 หลัก ระบบจะแสดงทุกหมวดที่มีเลขนี้ เช่น ตำแหน่งที่ทั้งปรับปรุงและเกลี่ยอัตรา';
+    // มีหลายปี = แสดงตัวเลือกปีข้างช่องค้นหา (ทุกปี / รายปี)
+    const multi=YEARS.length>1;
     sec.innerHTML='<div class="pos-box"><label for="posq">ค้นหาเลขที่ตำแหน่ง ข้ามทุกหมวด</label>'+
-      '<input id="posq" type="search" inputmode="numeric" placeholder="เช่น 173750" autocomplete="off">'+
-      '<span class="hint" id="posHint">'+HINT+'</span></div><div id="posOut"></div>';
-    const inp=sec.querySelector('#posq'), out=sec.querySelector('#posOut'), hint=sec.querySelector('#posHint');
-    let t;
+      '<div class="pos-row"><input id="posq" type="search" inputmode="numeric" placeholder="เช่น 173750" autocomplete="off">'+
+      (multi?'<label class="pos-yr">ปี <select id="posYr" aria-label="ปีที่ค้นหา"><option value="all">ทุกปี</option>'+YEARS.map(y=>'<option value="'+esc(y.year)+'">'+esc(y.year)+'</option>').join('')+'</select></label>':'')+
+      '</div><span class="hint" id="posHint">'+HINT+'</span></div><div id="posOut"></div>';
+    const inp=sec.querySelector('#posq'), out=sec.querySelector('#posOut'), hint=sec.querySelector('#posHint'), ysel=sec.querySelector('#posYr');
+    let t, seq=0;
     inp.oninput=()=>{ clearTimeout(t); t=setTimeout(run,120); };
-    function run(){
-      const q=inp.value.replace(/\s/g,'');
-      if(q.length<3){ out.innerHTML=''; hint.textContent=HINT; return; }
+    if(ysel){
+      try{ const v=localStorage.getItem('vacPosYr'); if(v&&[...ysel.options].some(o=>o.value===v))ysel.value=v; }catch(e){}
+      ysel.onchange=()=>{ try{ localStorage.setItem('vacPosYr',ysel.value); }catch(e){} run(); };
+    }
+    function groups(sheets,q,label){
       let n=0, g=0;
-      out.innerHTML=SHEETS.map(s=>{
+      const html=sheets.map(s=>{
         const rows=s.rows.filter(r=>String(r.posno).indexOf(q)>=0); if(!rows.length)return '';
         n+=rows.length; g++;
         const cols=colsFor(rows).filter(c=>c.k!=='reason');
-        return '<div class="group"><h3>'+esc(s.name)+'<span class="n">'+fmt(rows.length)+' รายการ</span></h3><div class="shell"><table><thead><tr><th>ลำดับ</th>'+
+        return '<div class="group"><h3>'+(label?esc(label)+' · ':'')+esc(s.name)+'<span class="n">'+fmt(rows.length)+' รายการ</span></h3><div class="shell"><table><thead><tr><th>ลำดับ</th>'+
           cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml(rows,cols,'')+'</tbody></table></div></div>';
-      }).join('')||'<div class="empty">ไม่พบเลขที่ตำแหน่ง “'+esc(q)+'” ในทุกหมวด</div>';
-      hint.textContent=n?'พบ '+fmt(n)+' รายการ ใน '+g+' หมวด':'';
+      }).join('');
+      return {html,n,g};
+    }
+    function show(q,res,nYears){
+      const html=res.map(r=>r.html).join(''), n=res.reduce((a,r)=>a+r.n,0), g=res.reduce((a,r)=>a+r.g,0);
+      out.innerHTML=html||'<div class="empty">ไม่พบเลขที่ตำแหน่ง “'+esc(q)+'” ในทุกหมวด'+(nYears>1?' ทุกปี':'')+'</div>';
+      hint.textContent=n?'พบ '+fmt(n)+' รายการ ใน '+g+' หมวด'+(nYears>1?' จาก '+res.filter(r=>r.n).length+' ปี':''):'';
       out.querySelectorAll('td.c-posno').forEach(td=>{ td.innerHTML=hl(td.textContent,q); });
+    }
+    function run(){
+      const q=inp.value.replace(/\s/g,''), my=++seq;
+      if(q.length<3){ out.innerHTML=''; hint.textContent=HINT; return; }
+      const pick=ysel?ysel.value:YEAR;
+      const ys=pick==='all'?YEARS:YEARS.filter(y=>y.year===pick);
+      if(ys.length===1&&ys[0].year===YEAR){ show(q,[groups(SHEETS,q,multi?'ปี '+YEAR:'')],1); return; }
+      hint.textContent='กำลังโหลดข้อมูล…';
+      Promise.all(ys.map(y=>loadYear(y).then(sh=>groups(sh,q,'ปี '+y.year)))).then(res=>{ if(my===seq)show(q,res,ys.length); })
+        .catch(err=>{ if(my===seq)hint.textContent='โหลดข้อมูลบางปีไม่สำเร็จ ('+err.message+')'; });
     }
     return {el:sec,focus(){ setTimeout(()=>inp.focus(),0); }};
   }
@@ -406,13 +431,16 @@ header.top{border-top:4px solid var(--brand)}
     });
     return sheets;
   }
-  const raw={};
+  const raw={}, prepared={};
   function fetchYear(y){
     return raw[y.year]||(raw[y.year]=fetch(y.file).then(r=>{ if(!r.ok)throw new Error(y.year+': '+r.status); return r.json(); }).catch(e=>{ delete raw[y.year]; throw e; }));
   }
+  function loadYear(y){
+    return prepared[y.year]?Promise.resolve(prepared[y.year]):fetchYear(y).then(d=>prepared[y.year]||(prepared[y.year]=prepare(d,y)));
+  }
 
   function init(data,y){
-    SHEETS=prepare(data,y);
+    SHEETS=prepared[y.year]=prepare(data,y);
     total=data.length;
     const meets=data.map(r=>r.meet).filter(Boolean);
     if(meets.length){ meetMin=Math.min(...meets); meetMax=Math.max(...meets); }
@@ -433,6 +461,8 @@ header.top{border-top:4px solid var(--brand)}
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
     YEAR=y.year;
     $('asOf').textContent=y.asOf||'';
+    // ท้ายหน้า: ลิงก์ดูข้อมูลทั้งปีของปีอื่น (มีหลายปีเท่านั้น)
+    if(YEARS.length>1)$('yrLinks').innerHTML='<br>ดูข้อมูลทั้งปี:'+YEARS.map(x=>x===y?'<b> '+esc(x.year)+' </b>':'<a href="?'+(x===YEARS[0]?'':'y='+esc(x.year))+'">'+esc(x.year)+'</a>').join('·');
     return fetchYear(y).then(d=>init(d,y));
   }).catch(err=>{
     main.innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ ('+esc(err.message)+') กรุณารีเฟรชหน้านี้</div>';
