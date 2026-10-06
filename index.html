@@ -2,7 +2,7 @@
 <html lang="th">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ทะเบียนคำขอใช้ตำแหน่งว่าง</title>
+<title>ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@600;700&display=swap">
@@ -166,7 +166,7 @@ header.top{border-top:4px solid var(--brand)}
 <header class="top">
   <div class="row">
     <div class="brand">
-      <h1>ทะเบียนคำขอใช้ตำแหน่งว่าง</h1>
+      <h1>ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง</h1>
       <span class="h1sub">(ข้าราชการ พนักงานราชการ พนักงานกระทรวงสาธารณสุข และลูกจ้างชั่วคราว)</span>
       <span class="sub">คณะอนุกรรมการบริหารทรัพยากรบุคคล เขตสุขภาพที่ 1 · <span class="yr" id="yearBox">ปี <span id="yearTxt"></span></span> · <span id="nCats">10</span> หมวดข้อมูล</span>
       <span class="sub" id="asOf">&nbsp;</span>
@@ -463,7 +463,7 @@ header.top{border-top:4px solid var(--brand)}
       ysel.onchange=()=>{ const p=new URLSearchParams(location.search); if(ysel.value===YEARS[0].year)p.delete('y'); else p.set('y',ysel.value); location.search=p.toString(); };
     } else $('yearTxt').textContent=y.year;
     $('asOf').textContent=y.asOf||'';
-    document.title='ทะเบียนคำขอใช้ตำแหน่งว่าง ปี '+YEAR;
+    document.title='ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง ปี '+YEAR;
     return fetchYear(y).then(d=>init(d,y));
   }).catch(err=>{
     main.innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ ('+esc(err.message)+') กรุณารีเฟรชหน้านี้</div>';
