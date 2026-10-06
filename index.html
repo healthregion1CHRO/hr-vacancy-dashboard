@@ -182,7 +182,7 @@ header.top{border-top:4px solid var(--brand)}
     <span class="pill num" id="pill">กำลังโหลด…</span>
   </div>
 </header>
-<nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-bar"><div class="tabs-in" id="tabs" role="tablist"></div><label class="yrpick" id="yrPick" hidden>ปี <select id="yrSel" aria-label="เลือกปีที่แสดง"></select></label></div></nav>
+<nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-bar"><div class="tabs-in" id="tabs" role="tablist"></div><label class="yrpick" id="yrPick">ปี <select id="yrSel" aria-label="เลือกปีที่แสดง"></select></label></div></nav>
 <main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
 <footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง</footer>
 
@@ -468,14 +468,13 @@ header.top{border-top:4px solid var(--brand)}
   }
 
   // years.json = รายการปีที่มีข้อมูล · ?y=2569 เปิดปีนั้น (ไม่ระบุ = ปีล่าสุด)
-  // มีหลายปี = แสดงตัวเลือกปีท้ายแถบแท็บ สลับปีในหน้าเดียวโดยไม่โหลดหน้าใหม่
+  // ตัวเลือกปีท้ายแถบแท็บ (แสดงเสมอ) สลับปีในหน้าเดียวโดยไม่โหลดหน้าใหม่
   fetch('years.json').then(r=>{ if(!r.ok)throw new Error(r.status); return r.json(); }).then(list=>{
     YEARS=list.slice().sort((a,b)=>+b.year-+a.year);
     const want=new URLSearchParams(location.search).get('y');
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
     const ysel=$('yrSel');
     ysel.innerHTML=YEARS.map(x=>'<option value="'+esc(x.year)+'">'+esc(x.year)+(x===YEARS[0]?' (ล่าสุด)':'')+'</option>').join('');
-    $('yrPick').hidden=YEARS.length<2;
     ysel.onchange=()=>{
       const ny=YEARS.find(x=>x.year===ysel.value);
       try{ const p=new URLSearchParams(location.search); if(ny===YEARS[0])p.delete('y'); else p.set('y',ny.year); history.replaceState(null,'',location.pathname+(p.toString()?'?'+p:'')); }catch(e){}
