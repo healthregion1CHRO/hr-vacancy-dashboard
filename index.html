@@ -344,11 +344,10 @@ header.top{border-top:4px solid var(--brand)}
 
   function buildPos(){
     const sec=document.createElement('section');
-    const multi=YEARS.length>1;
     const HINT='พิมพ์เลขที่ตำแหน่งอย่างน้อย 3 หลัก ระบบจะแสดงทุกหมวดที่มีเลขนี้ เช่น ตำแหน่งที่ทั้งปรับปรุงและเกลี่ยอัตรา';
     sec.innerHTML='<div class="pos-box"><label for="posq">ค้นหาเลขที่ตำแหน่ง ข้ามทุกหมวด</label>'+
       '<input id="posq" type="search" inputmode="numeric" placeholder="เช่น 173750" autocomplete="off">'+
-      (multi?'<label class="allyr"><input type="checkbox" id="posAll"> ค้นย้อนหลังทุกปี ('+YEARS.map(y=>esc(y.year)).join(', ')+')</label>':'')+
+      '<label class="allyr"><input type="checkbox" id="posAll"> ค้นย้อนหลังทุกปี ('+YEARS.map(y=>esc(y.year)).join(', ')+')</label>'+
       '<span class="hint" id="posHint">'+HINT+'</span></div><div id="posOut"></div>';
     const inp=sec.querySelector('#posq'), out=sec.querySelector('#posOut'), hint=sec.querySelector('#posHint'), all=sec.querySelector('#posAll');
     let t, seq=0;
