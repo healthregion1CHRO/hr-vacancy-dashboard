@@ -196,7 +196,7 @@ header.top{border-top:4px solid var(--brand)}
     {cat:'เกลี่ยอัตรา ขรก. แพทย์ประจำบ้าน (ขึ้นชั้นปีที่ 2)', name:'เกลี่ยอัตราตัดโอนแพทย์ประจำบ้าน'},
     {cat:'เกลี่ยอัตรา ขรก. (ตำแหน่งว่าง)', name:'เกลี่ยอัตราตัดโอน (ขรก) ต.ว่าง'},
     {cat:'ขอใช้ตำแหน่ง ขรก.', name:'ขอใช้ ขรก.'},
-    {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พนักงานราชการ'},
+    {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พนักงานราชการ', heads:{cond:'เงื่อนไข'}},
     {cat:'จ้าง/เปลี่ยนตำแหน่ง พกส.', name:'จ้าง (พกส)'},
     {cat:'พกส. เข้าสู่สายงานผู้ช่วย', name:'จ้าง (พกส) (ผู้ช่วย)'},
     {cat:'เปลี่ยนประเภทการจ้าง', name:'เปลี่ยนประเภทการจ้าง'},
@@ -204,7 +204,7 @@ header.top{border-top:4px solid var(--brand)}
     // ไม่ผ่านการประชุม มีเฉพาะเลขที่ตำแหน่ง/คำสั่ง/วันที่มีผล — ไม่นับในตารางจังหวัด
     {cat:'คำสั่งย้าย/รับโอน (ไม่ต้องขอใช้ตำแหน่ง)', name:'คำสั่งย้าย/รับโอน', orderOnly:true}
   ];
-  // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล)
+  // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล) · หมวดใดใช้หัวคอลัมน์ต่างไป ให้ใส่ heads:{คีย์:'หัวคอลัมน์'} ใน SHEETS
   const COLS=[
     {k:'org',h:'สังกัด'},
     {k:'unitFull',h:'ส่วนราชการ',cls:'c-wide'},
@@ -250,6 +250,7 @@ header.top{border-top:4px solid var(--brand)}
   function rowsHtml(rows,cols,q,showCat){
     return rows.map(r=>'<tr><td class="c-no">'+r.no+'</td>'+(showCat?'<td>'+esc(r.sheetName)+'</td>':'')+cols.map(c=>cell(r,c,q)).join('')+'</tr>').join('');
   }
+  function head(s,c){ return (s.heads&&s.heads[c.k])||c.h; }
   function colsFor(rows){ return COLS.filter(c=>rows.some(r=>r[c.k]!=null&&r[c.k]!=='')); }
 
   function makeTab(key,label,n){
@@ -318,7 +319,7 @@ header.top{border-top:4px solid var(--brand)}
     sec.innerHTML='<div class="sheet-head"><h2>'+esc(s.name)+'</h2><div class="meta">'+esc(s.cat)+' · '+fmt(s.rows.length)+' รายการ</div></div>'+
       '<div class="pager"><label>แสดง <select aria-label="จำนวนรายการต่อหน้า">'+SIZES.map(n=>'<option value="'+n+'">'+(n?n:'ทั้งหมด')+'</option>').join('')+'</select> รายการ</label>'+
       '<span class="range num"></span><span class="nav"><button type="button" data-d="-1" aria-label="หน้าก่อนหน้า">‹ ก่อนหน้า</button><span class="pg num"></span><button type="button" data-d="1" aria-label="หน้าถัดไป">ถัดไป ›</button></span></div>'+
-      '<div class="shell"><table><thead><tr><th>ลำดับ</th>'+cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody></tbody></table>'+
+      '<div class="shell"><table><thead><tr><th>ลำดับ</th>'+cols.map(c=>'<th>'+head(s,c)+'</th>').join('')+'</tr></thead><tbody></tbody></table>'+
       '<div class="empty" hidden>'+(s.rows.length?'ไม่พบรายการที่ตรงกับคำค้นหา ลองใช้คำที่สั้นลง':'ยังไม่มีรายการในหมวดนี้')+'</div></div>';
     const tb=sec.querySelector('tbody'), em=sec.querySelector('.empty'), shell=sec.querySelector('.shell');
     const sel=sec.querySelector('.pager select'), range=sec.querySelector('.pager .range'), pg=sec.querySelector('.pager .pg');
@@ -372,7 +373,7 @@ header.top{border-top:4px solid var(--brand)}
         n+=rows.length; g++;
         const cols=colsFor(rows).filter(c=>c.k!=='reason');
         return '<div class="group"><h3>'+(label?esc(label)+' · ':'')+esc(s.name)+'<span class="n">'+fmt(rows.length)+' รายการ</span></h3><div class="shell"><table><thead><tr><th>ลำดับ</th>'+
-          cols.map(c=>'<th>'+c.h+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml(rows,cols,'')+'</tbody></table></div></div>';
+          cols.map(c=>'<th>'+head(s,c)+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml(rows,cols,'')+'</tbody></table></div></div>';
       }).join('');
       return {html,n,g};
     }
