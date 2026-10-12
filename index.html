@@ -196,7 +196,7 @@ header.top{border-top:4px solid var(--brand)}
     {cat:'เกลี่ยอัตรา ขรก. แพทย์ประจำบ้าน (ขึ้นชั้นปีที่ 2)', name:'เกลี่ยอัตราตัดโอนแพทย์ประจำบ้าน'},
     {cat:'เกลี่ยอัตรา ขรก. (ตำแหน่งว่าง)', name:'เกลี่ยอัตราตัดโอน (ขรก) ต.ว่าง'},
     {cat:'ขอใช้ตำแหน่ง ขรก.', name:'ขอใช้ ขรก.'},
-    {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พนักงานราชการ', heads:{cond:'เงื่อนไข'}},
+    {cat:'ขอใช้ตำแหน่ง พนักงานราชการ', name:'พนักงานราชการ', heads:{cond:'เงื่อนไข',newpos:'ตัดโอน'}, after:{newpos:'cond'}},
     {cat:'จ้าง/เปลี่ยนตำแหน่ง พกส.', name:'จ้าง (พกส)'},
     {cat:'พกส. เข้าสู่สายงานผู้ช่วย', name:'จ้าง (พกส) (ผู้ช่วย)'},
     {cat:'เปลี่ยนประเภทการจ้าง', name:'เปลี่ยนประเภทการจ้าง'},
@@ -204,7 +204,7 @@ header.top{border-top:4px solid var(--brand)}
     // ไม่ผ่านการประชุม มีเฉพาะเลขที่ตำแหน่ง/คำสั่ง/วันที่มีผล — ไม่นับในตารางจังหวัด
     {cat:'คำสั่งย้าย/รับโอน (ไม่ต้องขอใช้ตำแหน่ง)', name:'คำสั่งย้าย/รับโอน', orderOnly:true}
   ];
-  // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล) · หมวดใดใช้หัวคอลัมน์ต่างไป ให้ใส่ heads:{คีย์:'หัวคอลัมน์'} ใน SHEETS
+  // คอลัมน์ที่อาจแสดง (แสดงเฉพาะที่หมวดนั้นมีข้อมูล) · หมวดใดใช้หัวคอลัมน์ต่างไป ให้ใส่ heads:{คีย์:'หัวคอลัมน์'} ใน SHEETS · ย้ายคอลัมน์ไปไว้หลังอีกคอลัมน์ after:{คีย์:'คีย์ที่จะต่อท้าย'}
   const COLS=[
     {k:'org',h:'สังกัด'},
     {k:'unitFull',h:'ส่วนราชการ',cls:'c-wide'},
@@ -216,6 +216,7 @@ header.top{border-top:4px solid var(--brand)}
     {k:'newpos',h:'ตำแหน่งใหม่ / ที่ขอ',cls:'c-wide'},
     {k:'typenew',h:'ประเภทการจ้างใหม่'},
     {k:'cond',h:'เงื่อนไขในการดำรงตำแหน่ง'},
+    {k:'person',h:'ผู้จะมาดำรงตำแหน่ง'},  // บอกเพียงว่ามีตัวบุคคลแล้ว ไม่แสดงชื่อ
     {k:'result',h:'ผลการพิจารณาเขต',badge:true},
     {k:'meetTxt',h:'ครั้งที่ประชุม'},
     {k:'letter',h:'หนังสือแจ้ง สป.',cls:'c-letter'},
@@ -251,7 +252,11 @@ header.top{border-top:4px solid var(--brand)}
     return rows.map(r=>'<tr><td class="c-no">'+r.no+'</td>'+(showCat?'<td>'+esc(r.sheetName)+'</td>':'')+cols.map(c=>cell(r,c,q)).join('')+'</tr>').join('');
   }
   function head(s,c){ return (s.heads&&s.heads[c.k])||c.h; }
-  function colsFor(rows){ return COLS.filter(c=>rows.some(r=>r[c.k]!=null&&r[c.k]!=='')); }
+  function colsFor(rows,s){
+    const cols=COLS.filter(c=>rows.some(r=>r[c.k]!=null&&r[c.k]!==''));
+    Object.entries((s&&s.after)||{}).forEach(([k,ref])=>{ const i=cols.findIndex(c=>c.k===k); if(i<0)return; const [c]=cols.splice(i,1); const j=cols.findIndex(x=>x.k===ref); cols.splice(j<0?i:j+1,0,c); });
+    return cols;
+  }
 
   function makeTab(key,label,n){
     const b=document.createElement('button');
@@ -314,7 +319,7 @@ header.top{border-top:4px solid var(--brand)}
   try{ const v=localStorage.getItem('vac69size'); if(v!==null&&SIZES.includes(+v))pageSize=+v; }catch(e){}
 
   function buildSheet(i){
-    const s=SHEETS[i], cols=colsFor(s.rows);
+    const s=SHEETS[i], cols=colsFor(s.rows,s);
     const sec=document.createElement('section');
     sec.innerHTML='<div class="sheet-head"><h2>'+esc(s.name)+'</h2><div class="meta">'+esc(s.cat)+' · '+fmt(s.rows.length)+' รายการ</div></div>'+
       '<div class="pager"><label>แสดง <select aria-label="จำนวนรายการต่อหน้า">'+SIZES.map(n=>'<option value="'+n+'">'+(n?n:'ทั้งหมด')+'</option>').join('')+'</select> รายการ</label>'+
@@ -371,7 +376,7 @@ header.top{border-top:4px solid var(--brand)}
       const html=sheets.map(s=>{
         const rows=s.rows.filter(r=>String(r.posno).indexOf(q)>=0); if(!rows.length)return '';
         n+=rows.length; g++;
-        const cols=colsFor(rows).filter(c=>c.k!=='reason');
+        const cols=colsFor(rows,s).filter(c=>c.k!=='reason');
         return '<div class="group"><h3>'+(label?esc(label)+' · ':'')+esc(s.name)+'<span class="n">'+fmt(rows.length)+' รายการ</span></h3><div class="shell"><table><thead><tr><th>ลำดับ</th>'+
           cols.map(c=>'<th>'+head(s,c)+'</th>').join('')+'</tr></thead><tbody>'+rowsHtml(rows,cols,'')+'</tbody></table></div></div>';
       }).join('');
