@@ -475,7 +475,7 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
   }
   const raw={}, prepared={};
   function fetchYear(y){
-    return raw[y.year]||(raw[y.year]=fetch(y.file).then(r=>{ if(!r.ok)throw new Error(y.year+': '+r.status); return r.json(); }).catch(e=>{ delete raw[y.year]; throw e; }));
+    return raw[y.year]||(raw[y.year]=fetch(y.file,{cache:'no-cache'}).then(r=>{ if(!r.ok)throw new Error(y.year+': '+r.status); return r.json(); }).catch(e=>{ delete raw[y.year]; throw e; }));
   }
   function loadYear(y){
     return prepared[y.year]?Promise.resolve(prepared[y.year]):fetchYear(y).then(d=>prepared[y.year]||(prepared[y.year]=prepare(d,y)));
@@ -507,7 +507,8 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
 
   // years.json = รายการปีที่มีข้อมูล · ?y=2569 เปิดปีนั้น (ไม่ระบุ = ปีล่าสุด)
   // ตัวเลือกปีท้ายแถบแท็บ (แสดงเสมอ) สลับปีในหน้าเดียวโดยไม่โหลดหน้าใหม่
-  fetch('years.json').then(r=>{ if(!r.ok)throw new Error(r.status); return r.json(); }).then(list=>{
+  // cache:'no-cache' = ถามเซิร์ฟเวอร์ทุกครั้งว่ามีข้อมูลใหม่ไหม (ไม่ใช้สำเนาเก่าในเครื่อง ไม่ต้องกด Ctrl+F5)
+  fetch('years.json',{cache:'no-cache'}).then(r=>{ if(!r.ok)throw new Error(r.status); return r.json(); }).then(list=>{
     YEARS=list.slice().sort((a,b)=>+b.year-+a.year);
     const want=new URLSearchParams(location.search).get('y');
     const y=YEARS.find(x=>x.year===want)||YEARS[0];
