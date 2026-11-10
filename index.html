@@ -251,6 +251,7 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
     {k:'result',h:'ผลการพิจารณาเขต',badge:true},
     {k:'meetTxt',h:'ครั้งที่ประชุม'},
     {k:'letter',h:'หนังสือ เขต แจ้ง สป.',cls:'c-letter'},
+    {k:'circ',h:'หนังสือ สป. แจ้งเวียน',cls:'c-letter',always:true},  // always = แสดงคอลัมน์เสมอในหมวดที่ผ่านการประชุม แม้ยังไม่มีข้อมูล
     {k:'order',h:'คำสั่ง',cls:'c-letter'},
     {k:'effDate',h:'วันที่มีผล'}
   ];
@@ -284,7 +285,7 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
   }
   function head(s,c){ return (s.heads&&s.heads[c.k])||c.h; }
   function colsFor(rows,s){
-    const cols=COLS.filter(c=>rows.some(r=>r[c.k]!=null&&r[c.k]!==''));
+    const cols=COLS.filter(c=>(c.always&&!(s&&s.orderOnly))||rows.some(r=>r[c.k]!=null&&r[c.k]!==''));
     Object.entries((s&&s.after)||{}).forEach(([k,ref])=>{ const i=cols.findIndex(c=>c.k===k); if(i<0)return; const [c]=cols.splice(i,1); const j=cols.findIndex(x=>x.k===ref); cols.splice(j<0?i:j+1,0,c); });
     return cols;
   }
@@ -467,7 +468,7 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
       r.no=s.rows.length+1; r.sheetName=s.name;
       r.unitFull=[r.unit,r.dept].filter(Boolean).join('\n');
       r.meetTxt=r.meet?('ครั้งที่ '+r.meet+'/'+y.year+(r.meetDate?'\n'+r.meetDate:'')):'';
-      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter,r.order,r.effDate].join(' ').toLowerCase();
+      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter,r.circ,r.order,r.effDate].join(' ').toLowerCase();
       s.rows.push(r);
     });
     sheets.total=data.length;
