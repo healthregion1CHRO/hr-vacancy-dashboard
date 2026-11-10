@@ -214,7 +214,67 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
   </div>
 </header>
 <nav class="tabs" aria-label="หมวดข้อมูล"><div class="tabs-bar"><div class="tabs-in" id="tabs" role="tablist"></div><label class="yrpick" id="yrPick">ปี <select id="yrSel" aria-label="เลือกปีที่แสดง"></select></label></div></nav>
-<main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
+<style>
+button.doc{display:inline-flex;align-items:flex-start;gap:6px;text-align:left;font:inherit;font-size:12.5px;line-height:1.45;color:var(--accent-strong);background:var(--accent-soft);border:1px solid transparent;border-radius:7px;padding:4px 8px;cursor:pointer}
+button.doc svg{flex:none;width:15px;height:15px;margin-top:2px}
+button.doc:hover{border-color:var(--accent)}
+button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dv{position:fixed;inset:0;z-index:100;background:rgba(6,21,12,.55);display:flex;align-items:stretch;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.dv-box{background:var(--surface);color:var(--text);border-radius:14px;width:min(980px,100%);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.dv-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface-alt)}
+.dv-head b{flex:1 1 220px;min-width:0;font-size:14px}
+.dv-head .pg{font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.dv-head button,.dv-head a{font:inherit;font-size:13px;font-weight:600;padding:6px 11px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--accent-strong);cursor:pointer;text-decoration:none}
+.dv-head button:hover,.dv-head a:hover{border-color:var(--accent)}
+.dv-head .x{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.dv-body{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;align-items:center;gap:12px;background:var(--bg)}
+.dv-body canvas{max-width:none;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18);border-radius:3px}
+.dv-msg{padding:40px 16px;text-align:center;color:var(--text-muted)}
+</style>
+<div class="dv" id="dv" hidden role="dialog" aria-modal="true" aria-labelledby="dvT">
+  <div class="dv-box">
+    <div class="dv-head"><b id="dvT"></b><span class="pg" id="dvP"></span>
+      <button type="button" id="dvOut" aria-label="ย่อ">−</button><button type="button" id="dvIn" aria-label="ขยาย">+</button>
+      <a id="dvOpen" href="#" target="_blank" rel="noopener">เปิดแท็บใหม่</a>
+      <button type="button" class="x" id="dvX">ปิด</button></div>
+    <div class="dv-body" id="dvB"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const V='3.11.174', CDN='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/'+V+'/';
+  const dv=document.getElementById('dv'), body=document.getElementById('dvB'), T=document.getElementById('dvT'), P=document.getElementById('dvP'), op=document.getElementById('dvOpen');
+  let lib=null, doc=null, scale=1, tok=0, lastFocus=null;
+  function load(src){ return new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>no(new Error('โหลดตัวแสดง PDF ไม่สำเร็จ')); document.head.appendChild(s); }); }
+  function getLib(){ if(lib)return Promise.resolve(lib); return load(CDN+'pdf.min.js').then(()=>load(CDN+'pdf.worker.min.js')).then(()=>{ lib=window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc=CDN+'pdf.worker.min.js'; return lib; }); }
+  async function render(){
+    const my=++tok; body.innerHTML='';
+    const w=Math.max(280,body.clientWidth-28), dpr=window.devicePixelRatio||1;
+    for(let i=1;i<=doc.numPages;i++){
+      const page=await doc.getPage(i); if(my!==tok)return;
+      const base=page.getViewport({scale:1}), s=(w/base.width)*scale, vp=page.getViewport({scale:s*dpr});
+      const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; c.style.width=(vp.width/dpr)+'px'; c.style.height=(vp.height/dpr)+'px';
+      c.setAttribute('aria-label','หน้า '+i); body.appendChild(c);
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; if(my!==tok)return;
+      P.textContent=doc.numPages+' หน้า';
+    }
+  }
+  async function openDoc(url,title){
+    lastFocus=document.activeElement; T.textContent=title; P.textContent=''; op.href=url; scale=1;
+    dv.hidden=false; document.body.style.overflow='hidden'; document.getElementById('dvX').focus();
+    body.innerHTML='<div class="dv-msg">กำลังเปิดหนังสือ…</div>';
+    try{ const L=await getLib(); doc=await L.getDocument({url}).promise; await render(); }
+    catch(e){ body.innerHTML='<div class="dv-msg">เปิดหนังสือไม่สำเร็จ ('+(e&&e.message||e)+') ลองกด “เปิดแท็บใหม่”</div>'; }
+  }
+  function close(){ tok++; dv.hidden=true; document.body.style.overflow=''; doc=null; if(lastFocus)lastFocus.focus(); }
+  document.addEventListener('click',e=>{ const b=e.target.closest('button.doc'); if(b)openDoc(b.dataset.pdf,b.dataset.t); });
+  document.getElementById('dvX').onclick=close;
+  dv.addEventListener('click',e=>{ if(e.target===dv)close(); });
+  document.addEventListener('keydown',e=>{ if(!dv.hidden&&e.key==='Escape')close(); });
+  document.getElementById('dvIn').onclick=()=>{ if(doc){ scale=Math.min(3,scale+.25); render(); } };
+  document.getElementById('dvOut').onclick=()=>{ if(doc){ scale=Math.max(.5,scale-.25); render(); } };
+})();
+</script><main id="main"><div class="empty">กำลังโหลดข้อมูล…</div></main>
 <footer>แปลงจากไฟล์ Excel “บัญชีการขอใช้ตำแหน่งว่าง ประจำเดือน --รวม” เพื่อดูและค้นหาออนไลน์ · ไม่แสดงชื่อบุคคลที่จะมาดำรงตำแหน่ง</footer>
 
 <script>
@@ -252,9 +312,16 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
     {k:'meetTxt',h:'ครั้งที่ประชุม'},
     {k:'letter',h:'หนังสือ เขต แจ้ง สป.',cls:'c-letter'},
     {k:'circ',h:'หนังสือ สป. แจ้งเวียน',cls:'c-letter',always:true},  // always = แสดงคอลัมน์เสมอในหมวดที่ผ่านการประชุม แม้ยังไม่มีข้อมูล
-    {k:'order',h:'คำสั่ง',cls:'c-letter'},
-    {k:'effDate',h:'วันที่มีผล'}
+    {k:'order',h:'คำสั่ง',cls:'c-letter',ooOnly:true},  // ooOnly = แสดงเฉพาะหมวดคำสั่งย้าย/รับโอน (ตัดออกจากหมวดที่ผ่านการประชุม)
+    {k:'effDate',h:'วันที่มีผล',ooOnly:true}
   ];
+  // หนังสือที่มีไฟล์ PDF (โฟลเดอร์ letters/): ข้อความในคอลัมน์ตรงกับคีย์ → กดแล้วเปิดหนังสือ
+  // ห้ามใส่ไฟล์ที่มีชื่อบุคคล (เช่น เอกสารแนบหนังสือเขต) เพราะเว็บนี้เปิดสาธารณะ
+  const LETTERS={
+    'สธ 0208.02/ว 7071 ลงวันที่ 24 กันยายน 2569':'letters/sp-w7071.pdf',
+    'สธ 0208.02/7821 ลงวันที่ 30 กันยายน 2569':'letters/sp-7821.pdf'
+  };
+  const DOCICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h6M9 17h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   const PROVS=['เชียงใหม่','เชียงราย','ลำพูน','ลำปาง','แม่ฮ่องสอน','น่าน','พะเยา','แพร่'];
   const $=id=>document.getElementById(id);
   const fmt=n=>n.toLocaleString('th-TH');
@@ -277,6 +344,7 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
   function cell(r,c,q){
     let v=r[c.k]; if(v==null||v==='')return '<td class="'+(c.cls||'')+'">'+(c.cls==='c-n'?'–':'')+'</td>';
     if(c.badge)return '<td><span class="badge '+badgeCls(v)+'">'+esc(v)+'</span></td>';
+    if(c.k==='letter'||c.k==='circ')return '<td class="'+(c.cls||'')+'">'+String(v).split('\n').map(line=>LETTERS[line]?'<button type="button" class="doc" data-pdf="'+esc(LETTERS[line])+'" data-t="'+esc(line)+'">'+DOCICON+'<span>'+hl(line,q)+'</span></button>':hl(line,q)).join('\n')+'</td>';
     if(c.k==='org')return '<td><span class="prov">'+esc(r.prov)+'</span>\n'+hl(v,q)+'</td>';
     return '<td class="'+(c.cls||'')+'">'+hl(v,q)+'</td>';
   }
@@ -285,7 +353,8 @@ th{background:var(--accent-soft);color:var(--accent-strong)}
   }
   function head(s,c){ return (s.heads&&s.heads[c.k])||c.h; }
   function colsFor(rows,s){
-    const cols=COLS.filter(c=>(c.always&&!(s&&s.orderOnly))||rows.some(r=>r[c.k]!=null&&r[c.k]!==''));
+    const oo=!!(s&&s.orderOnly);
+    const cols=COLS.filter(c=>!(c.ooOnly&&!oo)&&((c.always&&!oo)||rows.some(r=>r[c.k]!=null&&r[c.k]!=='')));
     Object.entries((s&&s.after)||{}).forEach(([k,ref])=>{ const i=cols.findIndex(c=>c.k===k); if(i<0)return; const [c]=cols.splice(i,1); const j=cols.findIndex(x=>x.k===ref); cols.splice(j<0?i:j+1,0,c); });
     return cols;
   }
