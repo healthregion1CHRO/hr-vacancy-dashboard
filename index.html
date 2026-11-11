@@ -230,6 +230,61 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .dv-body{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;align-items:center;gap:12px;background:var(--bg)}
 .dv-body canvas{max-width:none;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18);border-radius:3px}
 .dv-msg{padding:40px 16px;text-align:center;color:var(--text-muted)}
+/* ===== บัญชีรายงาน ===== */
+.rpt-ctl{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px;box-shadow:var(--shadow)}
+.rpt-ctl h2{font-size:17px;color:var(--accent-strong)}
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 16px}
+.rpt-f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--text-muted)}
+.rpt-f select,.rpt-f input[type=text]{font:inherit;font-size:14px;font-weight:500;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text)}
+.rpt-f select:focus,.rpt-f input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.rpt-f.wide{grid-column:1/-1}
+.rpt-cats{display:flex;flex-wrap:wrap;gap:6px}
+.rpt-cats label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);background:var(--surface-alt);border:1px solid var(--border);border-radius:999px;padding:5px 11px;cursor:pointer}
+.rpt-cats label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong);font-weight:600}
+.rpt-cats input{accent-color:var(--accent);margin:0}
+.rpt-cats .n{font-variant-numeric:tabular-nums;opacity:.7}
+.rpt-mini{font:inherit;font-size:12px;font-weight:600;background:none;border:0;color:var(--accent-strong);cursor:pointer;padding:2px 4px;text-decoration:underline;text-underline-offset:3px}
+.rpt-opts{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+.rpt-opts label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.rpt-opts input{accent-color:var(--accent)}
+.rpt-act{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.rpt-act button{font:inherit;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:0;cursor:pointer;color:#fff}
+.rpt-act button svg{width:18px;height:18px}
+.rpt-act .pdf{background:#b42318} .rpt-act .pdf:hover{background:#912018}
+.rpt-act .xls{background:#15803d} .rpt-act .xls:hover{background:#166534}
+.rpt-act button:disabled{opacity:.5;cursor:default}
+.rpt-act .st{font-size:12.5px;color:var(--text-muted)}
+.rpt-shell{overflow:auto;background:color-mix(in srgb,var(--text) 8%,var(--bg));border:1px solid var(--border);border-radius:12px;padding:20px}
+.rpt-paper{--ink:#111;--line:#8a8a8a;--head:#eef5f0;background:#fff;color:var(--ink);width:1123px;max-width:none;margin:0 auto;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,.18);font-family:"Sarabun","Noto Sans Thai",Tahoma,sans-serif;font-size:13px;line-height:1.45;color-scheme:light}
+.rpt-paper .t1{text-align:center;font-size:19px;font-weight:700;margin:0}
+.rpt-paper .t2{text-align:center;font-size:14.5px;font-weight:600;margin:2px 0 0}
+.rpt-paper .t3{text-align:center;font-size:13px;margin:2px 0 14px;color:#333}
+.rpt-paper h3{font-size:14.5px;margin:18px 0 6px;font-weight:700}
+.rpt-paper h3 small{font-weight:500;font-size:12.5px;color:#444;margin-left:6px}
+.rpt-paper table{border-collapse:collapse;width:100%;font-size:12px}
+.rpt-paper th,.rpt-paper td{border:1px solid var(--line);padding:4px 6px;vertical-align:top;position:static;white-space:pre-line;background:none;color:var(--ink)}
+.rpt-paper th{background:var(--head);font-weight:700;text-align:center;font-size:11.5px;white-space:normal}
+.rpt-paper td.n,.rpt-paper td.c{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rpt-paper tbody tr:hover td{background:none}
+.rpt-paper .k-meetTxt{min-width:84px} .rpt-paper .k-letter,.rpt-paper .k-circ,.rpt-paper .k-order{min-width:118px} .rpt-paper .k-unitFull,.rpt-paper .k-newpos{min-width:150px}
+.rpt-paper tr.sum td{font-weight:700;background:var(--head)}
+.rpt-paper .sumtbl{width:auto;min-width:60%;margin:0 auto}
+.rpt-paper .foot{margin-top:18px;font-size:11.5px;color:#444;display:flex;justify-content:space-between;gap:12px}
+.rpt-paper .none{padding:30px;text-align:center;color:#666}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body.rpt-on{background:#fff!important}
+  body.rpt-on header.top,body.rpt-on nav.tabs,body.rpt-on footer,body.rpt-on .rpt-ctl,body.rpt-on .dv{display:none!important}
+  body.rpt-on main{padding:0;max-width:none}
+  body.rpt-on .rpt-shell{border:0;padding:0;background:none;overflow:visible}
+  body.rpt-on .rpt-paper{width:auto;padding:0;box-shadow:none;font-size:11.5px}
+  .rpt-paper table{font-size:10.5px}
+  .rpt-paper thead{display:table-header-group}
+  .rpt-paper tr{break-inside:avoid}
+  .rpt-paper .pb{break-before:page}
+  .rpt-paper h3{break-after:avoid}
+  .rpt-paper th,.rpt-paper tr.sum td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 <div class="dv" id="dv" hidden role="dialog" aria-modal="true" aria-labelledby="dvT">
   <div class="dv-box">
@@ -502,6 +557,155 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     return {el:sec,focus(){ setTimeout(()=>inp.focus(),0); }};
   }
 
+  // ===== บัญชีรายงาน: เลือกหมวด/จังหวัด/ครั้งที่ประชุม/ผล → ดูตัวอย่าง A4 แนวนอน → บันทึก PDF (พิมพ์) หรือดาวน์โหลด Excel =====
+  const XLSX_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  const LETTER_KEYS=['letter','circ','order','effDate'];
+  const RES_OPTS=[['all','ทุกผล'],['good','เห็นชอบ / อนุมัติ'],['bad','ยกเลิก / ไม่เห็นชอบ / ไม่อนุมัติ'],['neutral','รอผล / อื่น ๆ']];
+  const ICON_PDF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>';
+  const ICON_XLS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
+  function buildRpt(){
+    const sec=document.createElement('section'); sec.className='rpt';
+    const meets=[...new Set(SHEETS.flatMap(s=>s.rows.map(r=>r.meet)).filter(Boolean))].sort((a,b)=>a-b);
+    sec.innerHTML='<div class="rpt-ctl"><h2>สร้างบัญชีรายงาน</h2>'+
+      '<div class="rpt-grid">'+
+        '<label class="rpt-f wide">ชื่อรายงาน<input type="text" id="rTitle" value="บัญชีการขอใช้ตำแหน่งว่าง ปีงบประมาณ '+esc(YEAR)+'"></label>'+
+        '<label class="rpt-f">จังหวัด<select id="rProv"><option value="">ทุกจังหวัด</option>'+PROVS.map(p=>'<option>'+esc(p)+'</option>').join('')+'</select></label>'+
+        '<label class="rpt-f">ต้นสังกัด<select id="rOrg"></select></label>'+
+        '<label class="rpt-f">เลขที่ตำแหน่ง<input type="text" id="rPos" inputmode="numeric" autocomplete="off" placeholder="เช่น 173750 · หลายเลขคั่นด้วยเว้นวรรค"></label>'+
+        '<label class="rpt-f">การประชุม<select id="rMeet"><option value="">ทุกครั้ง</option>'+meets.map(m=>'<option value="'+m+'">ครั้งที่ '+m+'/'+esc(YEAR)+'</option>').join('')+'</select></label>'+
+        '<label class="rpt-f">ผลการพิจารณา<select id="rRes">'+RES_OPTS.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></label>'+
+        '<div class="rpt-f wide"><span>หมวด <button type="button" class="rpt-mini" data-all="1">เลือกทั้งหมด</button><button type="button" class="rpt-mini" data-all="0">ล้าง</button></span>'+
+          '<div class="rpt-cats">'+SHEETS.map((s,i)=>'<label title="'+esc(s.cat)+'"><input type="checkbox" value="'+i+'"'+(s.orderOnly?'':' checked')+'>'+esc(s.name)+' <span class="n">'+fmt(s.rows.length)+'</span></label>').join('')+'</div></div>'+
+      '</div>'+
+      '<div class="rpt-opts"><label><input type="checkbox" id="rLet" checked> แสดงคอลัมน์เลขหนังสือ / คำสั่ง</label><label><input type="checkbox" id="rSum" checked> มีตารางสรุปตอนต้น</label><label><input type="checkbox" id="rPb" checked> ขึ้นหน้าใหม่ทุกหมวด (PDF)</label></div>'+
+      '<div class="rpt-act"><button type="button" class="pdf" id="rPdf">'+ICON_PDF+'บันทึก PDF / พิมพ์</button><button type="button" class="xls" id="rXls">'+ICON_XLS+'ดาวน์โหลด Excel</button><span class="st" id="rSt"></span></div>'+
+    '</div><div class="rpt-shell"><div class="rpt-paper" id="rPaper"></div></div>';
+    const q=sel=>sec.querySelector(sel);
+    let cur=null;
+    // ต้นสังกัด: จัดกลุ่มตามจังหวัด · เลือกจังหวัดแล้วเหลือเฉพาะสังกัดในจังหวัดนั้น
+    const allRows=SHEETS.flatMap(s=>s.rows), orgProv={};
+    allRows.forEach(r=>{ if(r.org&&!orgProv[r.org])orgProv[r.org]=r.prov||''; });
+    function fillOrg(){
+      const el=q('#rOrg'), was=el.value, p=q('#rProv').value;
+      const provs=(p?[p]:PROVS.concat(['']));
+      el.innerHTML='<option value="">ทุกสังกัด</option>'+provs.map(pv=>{
+        const os=Object.keys(orgProv).filter(o=>orgProv[o]===pv).sort((a,b)=>a.localeCompare(b,'th'));
+        return os.length?'<optgroup label="'+esc(pv||'อื่น ๆ')+'">'+os.map(o=>'<option>'+esc(o)+'</option>').join('')+'</optgroup>':'';
+      }).join('');
+      el.value=[...el.options].some(o=>o.value===was)?was:'';
+    }
+    fillOrg();
+    const posList=()=>q('#rPos').value.split(/[\s,;]+/).map(x=>x.replace(/\D/g,'')).filter(Boolean);
+    function opts(){
+      return {title:q('#rTitle').value.trim()||'บัญชีรายงาน',prov:q('#rProv').value,org:q('#rOrg').value,pos:posList(),meet:q('#rMeet').value,res:q('#rRes').value,
+        cats:[...sec.querySelectorAll('.rpt-cats input:checked')].map(x=>+x.value),letters:q('#rLet').checked,sum:q('#rSum').checked,pb:q('#rPb').checked};
+    }
+    function subtitle(o){
+      const p=['เขตสุขภาพที่ 1',o.prov?'จังหวัด'+o.prov:'ทุกจังหวัด'];
+      if(o.org)p.push(o.org);
+      if(o.pos.length)p.push('ตำแหน่งเลขที่ '+(o.pos.length>6?o.pos.slice(0,6).join(', ')+' และอีก '+(o.pos.length-6)+' เลข':o.pos.join(', ')));
+      p.push(o.meet?'การประชุมครั้งที่ '+o.meet+'/'+YEAR:'ทุกครั้งการประชุม');
+      if(o.res!=='all')p.push('ผล: '+RES_OPTS.find(x=>x[0]===o.res)[1]);
+      return p.join(' · ');
+    }
+    function compute(o){
+      const groups=o.cats.map(i=>{
+        const s=SHEETS[i];
+        const rows=s.rows.filter(r=>(!o.prov||r.prov===o.prov)&&(!o.org||r.org===o.org)&&(!o.pos.length||o.pos.some(p=>String(r.posno).indexOf(p)>=0))&&(!o.meet||String(r.meet)===o.meet)&&(o.res==='all'||badgeCls(r.result||'')===o.res));
+        let cols=colsFor(rows,s).filter(c=>o.letters||!LETTER_KEYS.includes(c.k));
+        cols=[{k:'prov',h:'จังหวัด'}].concat(cols);
+        return {s,rows,cols:cols.map(c=>({k:c.k,h:head(s,c)}))};
+      }).filter(g=>g.rows.length);
+      return {o,groups,sub:subtitle(o),asOf:(YEARS.find(y=>y.year===YEAR)||{}).asOf||'',total:groups.reduce((a,g)=>a+g.rows.length,0)};
+    }
+    const cnt=rows=>({ok:rows.filter(r=>badgeCls(r.result||'')==='good').length,bad:rows.filter(r=>badgeCls(r.result||'')==='bad').length});
+    function render(){
+      cur=compute(opts());
+      const {o,groups}=cur, paper=q('#rPaper');
+      let h='<p class="t1">'+esc(o.title)+'</p><p class="t2">'+esc(cur.sub)+'</p><p class="t3">'+esc(cur.asOf)+' · รวม '+fmt(cur.total)+' รายการ</p>';
+      if(!groups.length){ paper.innerHTML=h+'<div class="none">ไม่มีรายการตามเงื่อนไขที่เลือก</div>'; status(); return; }
+      if(o.sum){
+        let T={n:0,ok:0,bad:0};
+        h+='<h3>สรุปจำนวนรายการ</h3><table class="sumtbl"><thead><tr><th>ลำดับ</th><th>หมวด</th><th>จำนวน</th><th>เห็นชอบ / อนุมัติ</th><th>ยกเลิก / ไม่เห็นชอบ</th><th>รอผล / อื่น ๆ</th></tr></thead><tbody>'+
+          groups.map((g,i)=>{ const c=cnt(g.rows); T.n+=g.rows.length; T.ok+=c.ok; T.bad+=c.bad;
+            return '<tr><td class="c">'+(i+1)+'</td><td>'+esc(g.s.cat)+'</td><td class="n">'+fmt(g.rows.length)+'</td><td class="n">'+fmt(c.ok)+'</td><td class="n">'+fmt(c.bad)+'</td><td class="n">'+fmt(g.rows.length-c.ok-c.bad)+'</td></tr>'; }).join('')+
+          '<tr class="sum"><td></td><td>รวม</td><td class="n">'+fmt(T.n)+'</td><td class="n">'+fmt(T.ok)+'</td><td class="n">'+fmt(T.bad)+'</td><td class="n">'+fmt(T.n-T.ok-T.bad)+'</td></tr></tbody></table>';
+      }
+      h+=groups.map((g,gi)=>'<h3'+(o.pb&&(gi>0||o.sum)?' class="pb"':'')+'>'+(gi+1)+'. '+esc(g.s.cat)+'<small>'+fmt(g.rows.length)+' รายการ</small></h3>'+
+        '<table><thead><tr><th>ลำดับ</th>'+g.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'</tr></thead><tbody>'+
+        g.rows.map((r,i)=>'<tr><td class="c">'+(i+1)+'</td>'+g.cols.map(c=>'<td class="k-'+c.k+(c.k==='posno'?' c':'')+'">'+esc(r[c.k])+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join('');
+      h+='<div class="foot"><span>ที่มา: ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง เขตสุขภาพที่ 1</span><span>พิมพ์เมื่อ '+new Date().toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'})+'</span></div>';
+      paper.innerHTML=h; status();
+    }
+    function status(msg){
+      const n=cur?cur.total:0;
+      q('#rSt').textContent=msg||(n?fmt(n)+' รายการ ใน '+cur.groups.length+' หมวด':'ไม่มีรายการ');
+      q('#rPdf').disabled=q('#rXls').disabled=!n;
+      pill.textContent='รายงาน '+fmt(n)+' รายการ';
+    }
+    function fname(ext){
+      const o=cur.o, p=['บัญชีรายงาน',YEAR,o.org||o.prov||'ทุกจังหวัด'].concat(o.pos.length===1?['ตำแหน่ง'+o.pos[0]]:o.pos.length?['ตำแหน่ง'+o.pos.length+'เลข']:[],[o.meet?'ครั้งที่'+o.meet:'ทุกครั้ง']);
+      return p.join('-').replace(/[\\/:*?"<>|]/g,'')+'.'+ext;
+    }
+    function loadXlsx(){
+      if(window.XLSX)return Promise.resolve(window.XLSX);
+      return new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=XLSX_URL; s.onload=()=>ok(window.XLSX); s.onerror=()=>no(new Error('โหลดตัวสร้าง Excel ไม่สำเร็จ')); document.head.appendChild(s); });
+    }
+    // บันทึกไฟล์: ในหน้า Artifact ใช้ downloads ของ claude.ai · บนเว็บจริงใช้ลิงก์ดาวน์โหลดตามปกติ
+    async function saveFile(name,bytes,mime){
+      if(window.claude&&window.claude.use){
+        const d=await window.claude.use('downloads');
+        if(d){ try{ await d.save({filename:name,data:new Blob([bytes],{type:mime})}); return 'saved'; }catch(e){ if(e&&e.code==='declined')return 'declined'; throw e; } }
+      }
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([bytes],{type:mime})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); return 'saved';
+    }
+    async function toExcel(){
+      const btn=q('#rXls'); btn.disabled=true; status('กำลังสร้างไฟล์ Excel…');
+      try{
+        const X=await loadXlsx(), wb=X.utils.book_new(), {o,groups}=cur, used=new Set();
+        const sheetName=n=>{ let b=n.replace(/[\\/?*\[\]:]/g,'-').slice(0,28), s=b, k=2; while(used.has(s))s=b+' '+(k++); used.add(s); return s; };
+        const head3=extra=>[[o.title+(extra?' — '+extra:'')],[cur.sub],[cur.asOf],[]];
+        // ชีตสรุป
+        const sum=head3('สรุป'); sum.push(['ลำดับ','หมวด','จำนวน','เห็นชอบ / อนุมัติ','ยกเลิก / ไม่เห็นชอบ','รอผล / อื่น ๆ']);
+        let T=[0,0,0];
+        groups.forEach((g,i)=>{ const c=cnt(g.rows); T[0]+=g.rows.length; T[1]+=c.ok; T[2]+=c.bad; sum.push([i+1,g.s.cat,g.rows.length,c.ok,c.bad,g.rows.length-c.ok-c.bad]); });
+        sum.push(['','รวม',T[0],T[1],T[2],T[0]-T[1]-T[2]]);
+        // จังหวัด × หมวด
+        sum.push([],['จังหวัด'].concat(groups.map(g=>g.s.name),['รวม']));
+        PROVS.forEach(p=>{ const ns=groups.map(g=>g.rows.filter(r=>r.prov===p).length), t=ns.reduce((a,b)=>a+b,0); if(t)sum.push([p].concat(ns,[t])); });
+        const ws0=X.utils.aoa_to_sheet(sum);
+        ws0['!cols']=[{wch:12},{wch:46},{wch:10},{wch:16},{wch:18},{wch:14}].concat(groups.map(()=>({wch:12})));
+        ws0['!merges']=[0,1,2].map(r=>({s:{r,c:0},e:{r,c:5}}));
+        X.utils.book_append_sheet(wb,ws0,sheetName('สรุป'));
+        // ชีตละหมวด
+        groups.forEach(g=>{
+          const aoa=head3(g.s.cat); aoa.push(['ลำดับ'].concat(g.cols.map(c=>c.h)));
+          g.rows.forEach((r,i)=>aoa.push([i+1].concat(g.cols.map(c=>r[c.k]==null?'':String(r[c.k])))));
+          const ws=X.utils.aoa_to_sheet(aoa);
+          ws['!cols']=[{wch:6}].concat(g.cols.map(c=>({wch:c.k==='prov'?11:c.k==='posno'?10:/unitFull|newpos|pos|letter|circ|org/.test(c.k)?32:16})));
+          ws['!merges']=[0,1,2].map(r=>({s:{r,c:0},e:{r,c:Math.min(g.cols.length,8)}}));
+          ws['!autofilter']={ref:X.utils.encode_range({s:{r:4,c:0},e:{r:4+g.rows.length,c:g.cols.length}})};
+          X.utils.book_append_sheet(wb,ws,sheetName(g.s.name));
+        });
+        const buf=X.write(wb,{bookType:'xlsx',type:'array'});
+        const r=await saveFile(fname('xlsx'),buf,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        status(r==='declined'?'ยกเลิกการบันทึกไฟล์':'ดาวน์โหลด Excel แล้ว');
+      }catch(e){ status('สร้าง Excel ไม่สำเร็จ ('+(e&&e.message||e)+')'); }
+      btn.disabled=false;
+    }
+    function toPdf(){
+      const t=document.title; document.title=fname('pdf').replace(/\.pdf$/,'');
+      try{ window.print(); }catch(e){ status('เบราว์เซอร์นี้พิมพ์จากหน้านี้ไม่ได้ ลองเปิดหน้าเว็บในแท็บใหม่'); }
+      setTimeout(()=>{ document.title=t; },500);
+    }
+    sec.querySelectorAll('.rpt-mini').forEach(b=>b.onclick=()=>{ sec.querySelectorAll('.rpt-cats input').forEach(x=>x.checked=b.dataset.all==='1'); render(); });
+    sec.addEventListener('change',e=>{ if(e.target.id==='rProv')fillOrg(); if(e.target.matches('select,input[type=checkbox]'))render(); });
+    let tt; q('#rTitle').oninput=q('#rPos').oninput=()=>{ clearTimeout(tt); tt=setTimeout(render,250); };
+    q('#rPdf').onclick=toPdf; q('#rXls').onclick=toExcel;
+    render();
+    return {el:sec,show(){ status(); }};
+  }
+
   function openWith(i,q){
     select(i);
     search.value=q;
@@ -512,14 +716,16 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     active=key;
     Object.keys(tabBtns).forEach(k=>{ const on=String(k)===String(key); tabBtns[k].classList.toggle('on',on); tabBtns[k].setAttribute('aria-selected',on); });
     if(!built[key]){
-      built[key]=key==='overview'?buildOverview():key==='pos'?buildPos():buildSheet(key);
+      built[key]=key==='overview'?buildOverview():key==='pos'?buildPos():key==='rpt'?buildRpt():buildSheet(key);
       main.appendChild(built[key].el);
     }
     Object.keys(built).forEach(k=>{ built[k].el.hidden=String(k)!==String(key); });
     search.value='';
     if(key==='overview'){ search.disabled=true; search.placeholder='เลือกหมวดด้านบนเพื่อค้นหา...'; pill.textContent='รวม '+fmt(total)+' รายการ'; }
     else if(key==='pos'){ search.disabled=true; search.placeholder='ใช้ช่องค้นหาด้านล่างสำหรับเลขที่ตำแหน่ง'; pill.textContent='ค้นหาข้ามทุกหมวด'; built.pos.focus(); }
+    else if(key==='rpt'){ search.disabled=true; search.placeholder='เลือกเงื่อนไขรายงานด้านล่าง'; built.rpt.show(); }
     else { search.disabled=false; search.placeholder='ค้นหาใน “'+SHEETS[key].name+'”...'; built[key].filter(''); }
+    document.body.classList.toggle('rpt-on',key==='rpt');
     tabBtns[key].scrollIntoView({block:'nearest',inline:'nearest'});
     window.scrollTo(0,0);
     try{ localStorage.setItem('vac69tab',String(key)); }catch(e){}
@@ -563,9 +769,10 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     $('tabs').innerHTML=''; main.innerHTML='';
     makeTab('overview','ภาพรวม');
     makeTab('pos','🔍 ค้นหาเลขที่ตำแหน่ง');
+    makeTab('rpt','📄 บัญชีรายงาน');
     SHEETS.forEach((s,i)=>makeTab(i,esc(s.name),s.rows.length));
     let start='overview';
-    try{ const v=localStorage.getItem('vac69tab'); if(v==='pos')start='pos'; else if(v!=null&&SHEETS[+v]&&v!=='overview')start=+v; }catch(e){}
+    try{ const v=localStorage.getItem('vac69tab'); if(v==='pos'||v==='rpt')start=v; else if(v!=null&&SHEETS[+v]&&v!=='overview')start=+v; }catch(e){}
     select(start);
   }
   function showYear(y){
