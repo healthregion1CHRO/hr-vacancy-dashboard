@@ -595,7 +595,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       el.value=[...el.options].some(o=>o.value===was)?was:'';
     }
     fillOrg();
-    const posList=()=>q('#rPos').value.split(/[\s,;]+/).map(x=>x.replace(/\D/g,'')).filter(Boolean);
+    const posList=()=>q('#rPos').value.split(/[\s,;]+/).map(x=>x.replace(/\D/g,'').replace(/^0+/,'')).filter(Boolean);  // ค้นแบบตรงทั้งเลข (ไม่สนเลข 0 นำหน้า)
     function opts(){
       return {title:q('#rTitle').value.trim()||'บัญชีรายงาน',prov:q('#rProv').value,org:q('#rOrg').value,pos:posList(),meet:q('#rMeet').value,res:q('#rRes').value,
         cats:[...sec.querySelectorAll('.rpt-cats input:checked')].map(x=>+x.value),letters:q('#rLet').checked,sum:q('#rSum').checked,pb:q('#rPb').checked};
@@ -611,7 +611,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     function compute(o){
       const groups=o.cats.map(i=>{
         const s=SHEETS[i];
-        const rows=s.rows.filter(r=>(!o.prov||r.prov===o.prov)&&(!o.org||r.org===o.org)&&(!o.pos.length||o.pos.some(p=>String(r.posno).indexOf(p)>=0))&&(!o.meet||String(r.meet)===o.meet)&&(o.res==='all'||badgeCls(r.result||'')===o.res));
+        const rows=s.rows.filter(r=>(!o.prov||r.prov===o.prov)&&(!o.org||r.org===o.org)&&(!o.pos.length||o.pos.includes(String(r.posno).replace(/\D/g,'').replace(/^0+/,'')))&&(!o.meet||String(r.meet)===o.meet)&&(o.res==='all'||badgeCls(r.result||'')===o.res));
         let cols=colsFor(rows,s).filter(c=>o.letters||!LETTER_KEYS.includes(c.k));
         cols=[{k:'prov',h:'จังหวัด'}].concat(cols);
         return {s,rows,cols:cols.map(c=>({k:c.k,h:head(s,c)}))};
