@@ -247,6 +247,16 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rpt-opts{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
 .rpt-opts label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .rpt-opts input{accent-color:var(--accent)}
+.rpt-sign{display:flex;flex-direction:column;gap:8px;background:var(--surface-alt);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.rpt-sign-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px;font-weight:600;color:var(--text-muted)}
+.rpt-sign-h span{font-weight:400;font-size:12px}
+.rpt-sign select,.rpt-sign input{font:inherit;font-size:13.5px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.rpt-sign select:focus,.rpt-sign input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.rpt-sign-r{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1.2fr);gap:8px}
+@media (max-width:640px){ .rpt-sign-r{grid-template-columns:1fr} }
+.rpt-paper .sign{display:grid;gap:24px;margin:44px 0 6px;break-inside:avoid;page-break-inside:avoid}
+.rpt-paper .sign>div{text-align:center;font-size:13.5px}
+.rpt-paper .sign p{margin:0 0 8px}
 .rpt-act{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .rpt-act button{font:inherit;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:0;cursor:pointer;color:#fff}
 .rpt-act button svg{width:18px;height:18px}
@@ -266,7 +276,8 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .rpt-paper th{background:var(--head);font-weight:700;text-align:center;font-size:11.5px;white-space:normal}
 .rpt-paper td.n,.rpt-paper td.c{text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
 .rpt-paper tbody tr:hover td{background:none}
-.rpt-paper .k-meetTxt{min-width:84px} .rpt-paper .k-letter,.rpt-paper .k-circ,.rpt-paper .k-order{min-width:118px} .rpt-paper .k-unitFull,.rpt-paper .k-newpos{min-width:150px}
+.rpt-paper td{overflow-wrap:anywhere}
+.rpt-paper .k-meetTxt{min-width:72px} .rpt-paper .k-letter,.rpt-paper .k-circ,.rpt-paper .k-order{min-width:92px} .rpt-paper .k-unitFull,.rpt-paper .k-newpos{min-width:118px}
 .rpt-paper tr.sum td{font-weight:700;background:var(--head)}
 .rpt-paper .sumtbl{width:auto;min-width:60%;margin:0 auto}
 .rpt-paper .foot{margin-top:18px;font-size:11.5px;color:#444;display:flex;justify-content:space-between;gap:12px}
@@ -577,7 +588,10 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         '<div class="rpt-f wide"><span>หมวด <button type="button" class="rpt-mini" data-all="1">เลือกทั้งหมด</button><button type="button" class="rpt-mini" data-all="0">ล้าง</button></span>'+
           '<div class="rpt-cats">'+SHEETS.map((s,i)=>'<label title="'+esc(s.cat)+'"><input type="checkbox" value="'+i+'"'+(s.orderOnly?'':' checked')+'>'+esc(s.name)+' <span class="n">'+fmt(s.rows.length)+'</span></label>').join('')+'</div></div>'+
       '</div>'+
-      '<div class="rpt-opts"><label><input type="checkbox" id="rLet" checked> แสดงคอลัมน์เลขหนังสือ / คำสั่ง</label><label><input type="checkbox" id="rSum" checked> มีตารางสรุปตอนต้น</label><label><input type="checkbox" id="rPb" checked> ขึ้นหน้าใหม่ทุกหมวด (PDF)</label></div>'+
+      '<div class="rpt-opts"><label><input type="checkbox" id="rLet" checked> แสดงคอลัมน์เลขหนังสือ / คำสั่ง</label><label><input type="checkbox" id="rSum" checked> มีตารางสรุปตอนต้น</label><label><input type="checkbox" id="rPb" checked> ขึ้นหน้าใหม่ทุกหมวด (PDF)</label><label><input type="checkbox" id="rSign" checked> ช่องลงชื่อท้ายรายงาน</label></div>'+
+      '<div class="rpt-sign" id="rSignBox"><div class="rpt-sign-h">ผู้ลงนาม <select id="rSignN" aria-label="จำนวนผู้ลงนาม"><option value="1">1 คน</option><option value="2">2 คน</option><option value="3">3 คน</option></select><span>เว้นชื่อ/ตำแหน่งว่างไว้ = พิมพ์เป็นเส้นประให้เขียนเอง</span></div>'+
+        [0,1,2].map(k=>'<div class="rpt-sign-r" data-k="'+k+'"><input type="text" data-f="role" aria-label="บทบาทผู้ลงนาม '+(k+1)+'" placeholder="บทบาท เช่น ผู้จัดทำ"><input type="text" data-f="name" aria-label="ชื่อผู้ลงนาม '+(k+1)+'" placeholder="ชื่อ-สกุล"><input type="text" data-f="pos" aria-label="ตำแหน่งผู้ลงนาม '+(k+1)+'" placeholder="ตำแหน่ง"></div>').join('')+
+      '</div>'+
       '<div class="rpt-act"><button type="button" class="pdf" id="rPdf">'+ICON_PDF+'บันทึก PDF / พิมพ์</button><button type="button" class="xls" id="rXls">'+ICON_XLS+'ดาวน์โหลด Excel</button><span class="st" id="rSt"></span></div>'+
     '</div><div class="rpt-shell"><div class="rpt-paper" id="rPaper"></div></div>';
     const q=sel=>sec.querySelector(sel);
@@ -596,9 +610,23 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     }
     fillOrg();
     const posList=()=>q('#rPos').value.split(/[\s,;]+/).map(x=>x.replace(/\D/g,'').replace(/^0+/,'')).filter(Boolean);  // ค้นแบบตรงทั้งเลข (ไม่สนเลข 0 นำหน้า)
+    // ช่องลงชื่อท้ายรายงาน · จำค่าไว้ในเครื่องนี้ (ไม่ต้องพิมพ์ใหม่ทุกครั้ง)
+    const DOTS='..........................................';
+    const SIGN_DEF={on:true,n:2,list:[{role:'ผู้จัดทำ',name:'',pos:''},{role:'ผู้ตรวจสอบ',name:'',pos:''},{role:'ผู้รับรอง',name:'',pos:''}]};
+    let sg=SIGN_DEF; try{ const v=JSON.parse(localStorage.getItem('vacRptSign')||'null'); if(v&&Array.isArray(v.list)&&v.list.length===3)sg=v; }catch(e){}
+    q('#rSign').checked=sg.on!==false; q('#rSignN').value=String(sg.n||2);
+    sec.querySelectorAll('.rpt-sign-r').forEach(r=>r.querySelectorAll('input').forEach(i=>{ i.value=sg.list[+r.dataset.k][i.dataset.f]||''; }));
+    function signUi(){ const on=q('#rSign').checked, n=+q('#rSignN').value; q('#rSignBox').hidden=!on; sec.querySelectorAll('.rpt-sign-r').forEach(r=>r.hidden=+r.dataset.k>=n); }
+    function signSave(){
+      const list=[...sec.querySelectorAll('.rpt-sign-r')].map(r=>{ const o={}; r.querySelectorAll('input').forEach(i=>o[i.dataset.f]=i.value.trim()); return o; });
+      try{ localStorage.setItem('vacRptSign',JSON.stringify({on:q('#rSign').checked,n:+q('#rSignN').value,list})); }catch(e){}
+      return list;
+    }
+    function signers(){ return signSave().slice(0,+q('#rSignN').value); }
+    signUi();
     function opts(){
       return {title:q('#rTitle').value.trim()||'บัญชีรายงาน',prov:q('#rProv').value,org:q('#rOrg').value,pos:posList(),meet:q('#rMeet').value,res:q('#rRes').value,
-        cats:[...sec.querySelectorAll('.rpt-cats input:checked')].map(x=>+x.value),letters:q('#rLet').checked,sum:q('#rSum').checked,pb:q('#rPb').checked};
+        cats:[...sec.querySelectorAll('.rpt-cats input:checked')].map(x=>+x.value),letters:q('#rLet').checked,sum:q('#rSum').checked,pb:q('#rPb').checked,sign:q('#rSign').checked?signers():[]};
     }
     function subtitle(o){
       const p=['เขตสุขภาพที่ 1',o.prov?'จังหวัด'+o.prov:'ทุกจังหวัด'];
@@ -634,6 +662,8 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       h+=groups.map((g,gi)=>'<h3'+(o.pb&&(gi>0||o.sum)?' class="pb"':'')+'>'+(gi+1)+'. '+esc(g.s.cat)+'<small>'+fmt(g.rows.length)+' รายการ</small></h3>'+
         '<table><thead><tr><th>ลำดับ</th>'+g.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'</tr></thead><tbody>'+
         g.rows.map((r,i)=>'<tr><td class="c">'+(i+1)+'</td>'+g.cols.map(c=>'<td class="k-'+c.k+(c.k==='posno'?' c':'')+'">'+esc(r[c.k])+'</td>').join('')+'</tr>').join('')+'</tbody></table>').join('');
+      if(o.sign.length)h+='<div class="sign" style="grid-template-columns:repeat('+o.sign.length+',minmax(0,1fr))">'+o.sign.map(x=>
+        '<div><p>ลงชื่อ '+DOTS+' '+esc(x.role)+'</p><p>( '+(x.name?esc(x.name):DOTS)+' )</p><p>ตำแหน่ง '+(x.pos?esc(x.pos):DOTS)+'</p><p>วันที่ ........ / ........ / ........</p></div>').join('')+'</div>';
       h+='<div class="foot"><span>ที่มา: ทะเบียนติดตามคำขอใช้ตำแหน่งว่าง เขตสุขภาพที่ 1</span><span>พิมพ์เมื่อ '+new Date().toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'})+'</span></div>';
       paper.innerHTML=h; status();
     }
@@ -673,6 +703,12 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         // จังหวัด × หมวด
         sum.push([],['จังหวัด'].concat(groups.map(g=>g.s.name),['รวม']));
         PROVS.forEach(p=>{ const ns=groups.map(g=>g.rows.filter(r=>r.prov===p).length), t=ns.reduce((a,b)=>a+b,0); if(t)sum.push([p].concat(ns,[t])); });
+        // ช่องลงชื่อ: ผู้ลงนามเรียงคอลัมน์ B, D, F
+        if(o.sign.length){
+          const lines=x=>['ลงชื่อ '+DOTS+' '+x.role,'( '+(x.name||DOTS)+' )','ตำแหน่ง '+(x.pos||DOTS),'วันที่ ........ / ........ / ........'];
+          sum.push([],[]);
+          for(let li=0;li<4;li++){ const row=[]; o.sign.forEach((x,k)=>{ row[1+2*k]=lines(x)[li]; }); sum.push(row.map(v=>v==null?'':v)); }
+        }
         const ws0=X.utils.aoa_to_sheet(sum);
         ws0['!cols']=[{wch:12},{wch:46},{wch:10},{wch:16},{wch:18},{wch:14}].concat(groups.map(()=>({wch:12})));
         ws0['!merges']=[0,1,2].map(r=>({s:{r,c:0},e:{r,c:5}}));
@@ -699,7 +735,8 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       setTimeout(()=>{ document.title=t; },500);
     }
     sec.querySelectorAll('.rpt-mini').forEach(b=>b.onclick=()=>{ sec.querySelectorAll('.rpt-cats input').forEach(x=>x.checked=b.dataset.all==='1'); render(); });
-    sec.addEventListener('change',e=>{ if(e.target.id==='rProv')fillOrg(); if(e.target.matches('select,input[type=checkbox]'))render(); });
+    sec.querySelectorAll('.rpt-sign-r input').forEach(i=>i.oninput=()=>{ clearTimeout(tt); tt=setTimeout(render,250); });
+    sec.addEventListener('change',e=>{ if(e.target.id==='rProv')fillOrg(); if(e.target.id==='rSign'||e.target.id==='rSignN')signUi(); if(e.target.matches('select,input[type=checkbox]'))render(); });
     let tt; q('#rTitle').oninput=q('#rPos').oninput=()=>{ clearTimeout(tt); tt=setTimeout(render,250); };
     q('#rPdf').onclick=toPdf; q('#rXls').onclick=toExcel;
     render();
