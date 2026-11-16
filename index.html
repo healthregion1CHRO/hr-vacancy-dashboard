@@ -374,6 +374,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     {k:'typenew',h:'ประเภทการจ้างใหม่'},
     {k:'cond',h:'เงื่อนไขในการดำรงตำแหน่ง'},
     {k:'person',h:'ผู้จะมาดำรงตำแหน่ง'},  // บอกเพียงว่ามีตัวบุคคลแล้ว ไม่แสดงชื่อ
+    {k:'agLetter',h:'หนังสือ (หน่วยงาน)',cls:'c-letter',always:true},  // หนังสือจากหน่วยงานที่ยื่นขอ (ก่อนผลการพิจารณาเขต)
     {k:'result',h:'ผลการพิจารณาเขต',badge:true},
     {k:'meetTxt',h:'ครั้งที่ประชุม'},
     {k:'letter',h:'หนังสือ เขต แจ้ง สป.',cls:'c-letter'},
@@ -410,7 +411,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   function cell(r,c,q){
     let v=r[c.k]; if(v==null||v==='')return '<td class="'+(c.cls||'')+'">'+(c.cls==='c-n'?'–':'')+'</td>';
     if(c.badge)return '<td><span class="badge '+badgeCls(v)+'">'+esc(v)+'</span></td>';
-    if(c.k==='letter'||c.k==='circ')return '<td class="'+(c.cls||'')+'">'+String(v).split('\n').map(line=>LETTERS[line]?'<button type="button" class="doc" data-pdf="'+esc(LETTERS[line])+'" data-t="'+esc(line)+'">'+DOCICON+'<span>'+hl(line,q)+'</span></button>':hl(line,q)).join('\n')+'</td>';
+    if(c.k==='letter'||c.k==='circ'||c.k==='agLetter')return '<td class="'+(c.cls||'')+'">'+String(v).split('\n').map(line=>LETTERS[line]?'<button type="button" class="doc" data-pdf="'+esc(LETTERS[line])+'" data-t="'+esc(line)+'">'+DOCICON+'<span>'+hl(line,q)+'</span></button>':hl(line,q)).join('\n')+'</td>';
     if(c.k==='org')return '<td><span class="prov">'+esc(r.prov)+'</span>\n'+hl(v,q)+'</td>';
     return '<td class="'+(c.cls||'')+'">'+hl(v,q)+'</td>';
   }
@@ -570,7 +571,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   // ===== บัญชีรายงาน: เลือกหมวด/จังหวัด/ครั้งที่ประชุม/ผล → ดูตัวอย่าง A4 แนวนอน → บันทึก PDF (พิมพ์) หรือดาวน์โหลด Excel =====
   const XLSX_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-  const LETTER_KEYS=['letter','circ','order','effDate'];
+  const LETTER_KEYS=['agLetter','letter','circ','order','effDate'];
   const RES_OPTS=[['all','ทุกผล'],['good','เห็นชอบ / อนุมัติ'],['bad','ยกเลิก / ไม่เห็นชอบ / ไม่อนุมัติ'],['neutral','รอผล / อื่น ๆ']];
   const ICON_PDF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>';
   const ICON_XLS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
@@ -780,7 +781,7 @@ button.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       r.no=s.rows.length+1; r.sheetName=s.name;
       r.unitFull=[r.unit,r.dept].filter(Boolean).join('\n');
       r.meetTxt=r.meet?('ครั้งที่ '+r.meet+'/'+y.year+(r.meetDate?'\n'+r.meetDate:'')):'';
-      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.letter,r.circ,r.order,r.effDate].join(' ').toLowerCase();
+      r._s=[r.prov,r.org,r.unitFull,r.posno,r.pos,r.level,r.exec,r.newpos,r.typeold,r.typenew,r.cond,r.reason,r.result,r.meetTxt,r.agLetter,r.letter,r.circ,r.order,r.effDate].join(' ').toLowerCase();
       s.rows.push(r);
     });
     sheets.total=data.length;
